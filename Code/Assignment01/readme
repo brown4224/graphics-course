@@ -1,0 +1,16 @@
+Sean McGlincy
+June 6, 2017
+
+I moved the Common folder into the local path.
+
+You can change the rendering engine by changing
+the flag:  False is LINES  and True is TRIANGLES
+    var isTraingle = false;
+
+You can turn on console logging of the array values:
+    var isDebugg = false;
+
+
+You can change the default on page load with:
+    var numberOfIterations = 0;
+    var degrees = 0;
