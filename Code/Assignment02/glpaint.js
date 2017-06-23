@@ -59,7 +59,7 @@ window.onload = function init() {
     console.log("Sending to Buffer");
     createBuffer();
     currentRender = gl.LINE_STRIP;
-    shapeArray.push([currentRender, index, index]);   // Keeps track of (render type, start, end)
+    // shapeArray.push([currentRender, index, index]);   // Keeps track of (render type, start, end)
 
 
 
@@ -84,34 +84,31 @@ window.onload = function init() {
             shapeArraySize = 0;
 
             // Create new buffer
+            // varray = new Array(bufferSize);
+            // carray = new Array(2 * bufferSize);
+
             shapeArray.push([currentRender, 0, 0]);
-            // createBuffer();
+            createBuffer();
 
         };
     document.getElementById("button-undo").onclick =
         function () {
         console.log('undo');
-        if (undoCount > 0) {
+            console.log('Shapes Array: ');
+            console.log(shapeArray);
 
-            index = undo.pop();
-            // Check if the shape changed change
-            if(index < shapeArray[shapeArraySize][1]){
-                shapeArray.pop();
-                shapeArraySize--;
-            }
-
-            undoCount--;
-            shapeArray[shapeArraySize][2] = index;
+            shapeArray.pop();
+            shapeArraySize--;
+            if(shapeArraySize > 0)
+                index = shapeArray[shapeArraySize - 1][2];
+            else
+                index = 0;
 
 
-
+            console.log('Index: ' + index);
 
             if (clickCount > 0)
                 clickCount--;
-
-        }
-
-
 
         };
 
@@ -160,51 +157,40 @@ window.onload = function init() {
     document.getElementById("menu-shape").addEventListener("click", function () {
 
 
-        // var currentShape;
+        // Changes the shape and render primative
         switch (this.selectedIndex) {
             case 0:
                 shape = 0;  // Line
                 currentRender = gl.LINE_STRIP;
-                // currentShape = [renderType[0], index, index];
                 break;
             case 1:
                 shape = 1;  // Line Triangle
                 currentRender = gl.LINE_STRIP;
-                // currentShape = [renderType[0], index, index ];
                 break;
             case 2:
                 shape = 2;  // Solid Triangle
                 currentRender = gl.TRIANGLE_STRIP;
-                // currentShape = [renderType[1], index, index];
                 break;
             case 3:
                 shape = 3;  // Line Rectangle
                 currentRender = gl.LINE_STRIP;
-                // currentShape = [renderType[0], index, index];
                 break;
             case 4:
                 shape = 4;  // Solid Rectangle
                 currentRender = gl.TRIANGLE_STRIP;
-                // currentShape = [renderType[1], index, index];
                 break;
             case 5:
                 shape = 5;  // Line Circle
                 currentRender = gl.LINE_STRIP;
-                // currentShape = [renderType[0], index, index];
                 break;
             case 6:
                 shape = 6;  // Solid Circle
-                currentRender = gl.LINE_STRIP;
-                // currentShape = [renderType[1], index, index];
+                currentRender = gl.TRIANGLE_FAN;
                 break;
             default:
                 shape = 0;
         }
         clickCount = 0;
-        // shapeArray.push(currentShape);
-        shapeArray.push([currentRender, index, index]);
-
-        shapeArraySize++;
     });
 
     // Draw points and Graphics
@@ -252,7 +238,6 @@ window.onload = function init() {
                 break;
         }
     }
-
     function drawRectangle(points){
         if(clickCount % 2 == 0) {
             firstClick = points;
@@ -304,10 +289,13 @@ window.onload = function init() {
 
         }
     }
-
     function drawCircle(point) {
         if(clickCount % 2 == 0){
             firstClick = point;
+            if(shape == 6){ // Circle Sold
+                // Place first click in center and use traingle fan
+                draw(firstClick);
+            }
         } else{
             var organ =  firstClick;
 
@@ -330,7 +318,6 @@ window.onload = function init() {
         }
 
     }
-
     function distance(x, y) {
         return Math.sqrt(x * x + y * y);
     }
@@ -343,7 +330,11 @@ window.onload = function init() {
     // Mouse Clicks
     var gc = document.getElementById("gl-canvas");
     gc.addEventListener("mousedown", function (event) {
-        undo.push(index);
+        console.log("Mouse Down.  Add Point");
+        // undo.push(index);
+        // undoCount++;
+        shapeArray.push([currentRender, index, index]);
+        shapeArraySize++;
 
         var points = getPoints(event);
 
@@ -373,13 +364,15 @@ window.onload = function init() {
                 drawCircle(points);
             break;
             case 6: // Solid Circle
+                drawCircle(points);
+                // drawSolidCircle(points);
                 break;
             default:
                 alert("An error occurred");
         }
 
-            clickCount++;
-            undoCount++;
+
+
     });
 
 
@@ -388,6 +381,9 @@ window.onload = function init() {
             canvas.onmousemove = null;
             drawBlankPoint();
         }
+        shapeArray[shapeArraySize - 1][2] = index;
+        clickCount++;
+
 
     });
 
@@ -416,6 +412,9 @@ window.onload = function init() {
     }
     // Use buffer subdata:  memory location, offset, data
     function updateBuffer(pointArray, colorArray) {
+        // varray[index] = pointArray;
+        // carray[index] = colorArray;
+
             // Pointer Array
         gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
         gl.bufferSubData(gl.ARRAY_BUFFER, 8 * index, flatten(pointArray));
@@ -426,7 +425,7 @@ window.onload = function init() {
 
 
         index++;
-        shapeArray[shapeArraySize][2] = index;
+        shapeArray[shapeArraySize - 1][2] = index;
     }
 
     render();
@@ -437,17 +436,17 @@ window.onload = function init() {
 function render() {
     gl.clear(gl.COLOR_BUFFER_BIT);
 
-    for(var i = 0; i <= shapeArraySize; i++){
+    for(var i = 0; i < shapeArraySize; i++){
         // gl.drawArrays(gl.LINE_STRIP, shapeArray[i][1], shapeArray[i][2] + 1);
         gl.drawArrays(shapeArray[i][0], shapeArray[i][1], shapeArray[i][2] );
 
-        console.log("Shapes array " + i);
-        console.log("index:" + index );
-        console.log("shapes array size:" + shapeArraySize );
-        console.log(shapeArray[i]);
-        console.log(shapeArray[i][0]);
-        console.log(shapeArray[i][1]);
-        console.log(shapeArray[i][2]);
+        // console.log("Shapes array " + i);
+        // console.log("index:" + index );
+        // console.log("shapes array size:" + shapeArraySize );
+        // console.log(shapeArray[i]);
+        // console.log(shapeArray[i][0]);
+        // console.log(shapeArray[i][1]);
+        // console.log(shapeArray[i][2]);
     }
 
 
