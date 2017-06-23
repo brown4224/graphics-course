@@ -22,7 +22,6 @@ var color = red;   // Current Color
 //Shapes
 var lineSize = 1;
 var shape = 0;   // line, triangle, circle
-// var renderType;
 var currentRender;
 var shapeArray = [];
 var shapeArraySize = 0;
@@ -59,7 +58,6 @@ window.onload = function init() {
     console.log("Sending to Buffer");
     createBuffer();
     currentRender = gl.LINE_STRIP;
-    // shapeArray.push([currentRender, index, index]);   // Keeps track of (render type, start, end)
 
 
 
@@ -97,18 +95,18 @@ window.onload = function init() {
             console.log('Shapes Array: ');
             console.log(shapeArray);
 
-            shapeArray.pop();
-            shapeArraySize--;
-            if(shapeArraySize > 0)
-                index = shapeArray[shapeArraySize - 1][2];
-            else
-                index = 0;
+            if(shapeArraySize > 0){
+                var lastIndex = shapeArray.pop();
+                shapeArraySize--;
 
+                if(shapeArraySize > 0)
+                    index = lastIndex[1];
+                else
+                    index = 0;
 
-            console.log('Index: ' + index);
-
-            if (clickCount > 0)
-                clickCount--;
+                if (clickCount > 0)
+                    clickCount--;
+            }
 
         };
 
@@ -331,9 +329,7 @@ window.onload = function init() {
     var gc = document.getElementById("gl-canvas");
     gc.addEventListener("mousedown", function (event) {
         console.log("Mouse Down.  Add Point");
-        // undo.push(index);
-        // undoCount++;
-        shapeArray.push([currentRender, index, index]);
+        shapeArray.push([currentRender, index, 1]);
         shapeArraySize++;
 
         var points = getPoints(event);
@@ -370,9 +366,6 @@ window.onload = function init() {
             default:
                 alert("An error occurred");
         }
-
-
-
     });
 
 
@@ -381,10 +374,7 @@ window.onload = function init() {
             canvas.onmousemove = null;
             drawBlankPoint();
         }
-        shapeArray[shapeArraySize - 1][2] = index;
         clickCount++;
-
-
     });
 
     //  BUFFER
@@ -410,11 +400,7 @@ window.onload = function init() {
         gl.enableVertexAttribArray(vColor);
 
     }
-    // Use buffer subdata:  memory location, offset, data
     function updateBuffer(pointArray, colorArray) {
-        // varray[index] = pointArray;
-        // carray[index] = colorArray;
-
             // Pointer Array
         gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
         gl.bufferSubData(gl.ARRAY_BUFFER, 8 * index, flatten(pointArray));
@@ -422,10 +408,8 @@ window.onload = function init() {
         // Color Array
         gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
         gl.bufferSubData(gl.ARRAY_BUFFER, 16 * index, flatten(colorArray));
-
-
         index++;
-        shapeArray[shapeArraySize - 1][2] = index;
+        shapeArray[shapeArraySize - 1][2]++;
     }
 
     render();
@@ -435,23 +419,10 @@ window.onload = function init() {
 
 function render() {
     gl.clear(gl.COLOR_BUFFER_BIT);
-
     for(var i = 0; i < shapeArraySize; i++){
-        // gl.drawArrays(gl.LINE_STRIP, shapeArray[i][1], shapeArray[i][2] + 1);
         gl.drawArrays(shapeArray[i][0], shapeArray[i][1], shapeArray[i][2] );
-
-        // console.log("Shapes array " + i);
-        // console.log("index:" + index );
-        // console.log("shapes array size:" + shapeArraySize );
-        // console.log(shapeArray[i]);
-        // console.log(shapeArray[i][0]);
-        // console.log(shapeArray[i][1]);
-        // console.log(shapeArray[i][2]);
     }
-
-
     window.requestAnimationFrame(render);
-
 }
 
 
