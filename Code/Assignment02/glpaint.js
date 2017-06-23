@@ -4,7 +4,9 @@ var undo = [];
 var undoCount = 0;
 var clickCount = 0;
 var firstClick;
+var secondClick;
 var erase = false;
+
 
 // Colors
 var red = vec4(1, 0, 0, 1);
@@ -58,11 +60,11 @@ window.onload = function init() {
     // Buttions
     document.getElementById("button-canvas-width").onclick =
         function () {
-            canvas.width *= 1.10
+            canvas.width +=canvas.width;
         };
     document.getElementById("button-canvas-height").onclick =
         function () {
-            canvas.height *= 1.10
+            canvas.height *= 1.10;
         };
     document.getElementById("button-canvas-clear").onclick =
         function () {
@@ -160,7 +162,7 @@ window.onload = function init() {
                 currentRender = gl.LINE_STRIP;
                 break;
             case 3:
-                shape = 3;  // Solid Triangle
+                shape = 3;  // Solid Rectangle
                 currentRender = gl.TRIANGLE_STRIP;
                 break;
             case 4:
@@ -182,7 +184,9 @@ window.onload = function init() {
             default:
                 shape = 0;
         }
+
         clickCount = 0;
+        firstClick = null;
     });
 
     // Draw points and Graphics
@@ -191,10 +195,11 @@ window.onload = function init() {
         // offset window scrolling
         var top = this.scrollY;
         var left = this.scrollX;
+
         top *= 2;
         left *= 2;
-
-        return vec2(((2 * event.clientX + left) / canvas.width - 1),
+window.getel
+        return vec2(((2 * event.clientX + left) /  canvas.width  - 1),
             (((2 * (canvas.height - event.clientY)) - top   ) / canvas.height - 1));
     }
     function drawBlankPoint() {
@@ -233,21 +238,41 @@ window.onload = function init() {
          c, a
          */
         switch (clickCount % 3) {
-            case 0:  // click 0:  write a
+            case 0:
                 firstClick = points;
-                draw(points);
                 break;
-            case 1:  // click 1:  write b b
-                draw(points);
-                draw(points);
+            case 1:
+                secondClick = points;
+
                 break;
-            case 2: // click 2:  write c c a  (BLANK)
-                draw(points);
+            case 2:
+                draw(firstClick); // click 0:  write a
+
+                draw(secondClick);
+                draw(secondClick);   // click 1:  write b b
+
+                draw(points);  // click 2:  write c c a  (BLANK)
                 draw(points);
                 draw(firstClick);
                 drawBlankPoint();
                 break;
         }
+    }
+    function drawSolidTriangle(points) {
+        switch (clickCount % 3) {
+            case 0:
+                firstClick = points;
+                break;
+            case 1:
+                secondClick = points;
+                break;
+            case 2:
+                draw(firstClick);
+                draw(secondClick);
+                draw(points);
+                break;
+        }
+
     }
     function drawRectangle(points) {
         if (clickCount % 2 == 0) {
@@ -365,14 +390,12 @@ window.onload = function init() {
                     lastPoint = points;
                 };
                 break;
+
             case 2: // Line Triangle
                 drawLineTriangle(points);
                 break;
             case 3: // Solid Triangle
-
-                draw(points);
-                if (clickCount % 3 == 2)
-                    drawBlankPoint();
+                drawSolidTriangle(points);
                 break;
             case 4: // Line Rectangle
                 drawRectangle(points);
@@ -385,7 +408,6 @@ window.onload = function init() {
                 break;
             case 7: // Solid Circle
                 drawCircle(points);
-                // drawSolidCircle(points);
                 break;
             default:
                 alert("An error occurred");
@@ -434,6 +456,7 @@ window.onload = function init() {
         gl.bufferSubData(gl.ARRAY_BUFFER, 16 * index, flatten(colorArray));
         index++;
         shapeArray[shapeArraySize - 1][2]++;
+
     }
     render();
 };
