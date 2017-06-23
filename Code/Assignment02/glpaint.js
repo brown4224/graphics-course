@@ -1,9 +1,8 @@
 var gl;
 var index = 0;
-var undo = [];
+// var undo = [];
 var undoCount = 0;
 var clickCount = 0;
-// var clickData = [];
 var firstClick;
 var erase = false;
 
@@ -20,7 +19,11 @@ var color = red;   // Current Color
 
 //Shapes
 var lineSize = 1;
-var shape = 0;
+var shape = 0;   // line, triangle, circle
+var renderType;
+var shapeArray = [];
+var shapeArraySize = 0;
+
 
 // Buffer
 var vBuffer;
@@ -28,19 +31,18 @@ var vPosition;
 var cBuffer;
 var vColor;
 
-// var vBuffer2;
-// var vPosition2;
-// var cBuffer2;
-// var vColor2;
-
 
 window.onload = function init() {
     var canvas = document.getElementById("gl-canvas");
     gl = WebGLUtils.setupWebGL(canvas);
+
     if (!gl) {
         alert("WebGL isn't available");
     }
 
+
+
+    // currentShape = [renderType[0], index];  //render type, start, end
     //  Configure WebGL
     gl.viewport(0, 0, canvas.width, canvas.height);
     gl.clearColor(background[0], background[1], background[2], background[3]);
@@ -49,8 +51,14 @@ window.onload = function init() {
     var program = initShaders(gl, "vertex-shader", "fragment-shader");
     gl.useProgram(program);
 
+
+
+
     console.log("Sending to Buffer");
     createBuffer();
+    renderType = [gl.LINE_STRIP, gl.TRIANGLE_STRIP];
+    shapeArray.push([renderType[0], index, index]);
+    // shapeArraySize++;
 
 
     // Buttions
@@ -68,10 +76,19 @@ window.onload = function init() {
         };
     document.getElementById("button-undo").onclick =
         function () {
-            if (undoCount > 0) {
-                index = undo.pop();
-                undoCount--;
-            }
+        console.log('undo');
+            // if (shapeArraySize > 0) {
+            //     shapeArray.pop();
+            //     shapeArraySize--;
+            //     index = shapeArray[shapeArraySize][2];
+                // undoCount--;
+                // if(shapeArray[shapeArraySize][1] < index ){
+                //     shapeArray.pop();
+                //     index--;
+                // }
+                // shapeArray[shapeArraySize][2] = index;
+
+
         };
 
 
@@ -118,30 +135,43 @@ window.onload = function init() {
     });
     document.getElementById("menu-shape").addEventListener("click", function () {
 
+
+        var currentShape;
         switch (this.selectedIndex) {
             case 0:
                 shape = 0;  // Line
+                currentShape = [renderType[0], index, index];
                 break;
             case 1:
                 shape = 1;  // Line Triangle
+                currentShape = [renderType[0], index, index ];
                 break;
             case 2:
                 shape = 2;  // Solid Triangle
+                currentShape = [renderType[1], index, index];
                 break;
             case 3:
                 shape = 3;  // Line Rectangle
+                currentShape = [renderType[0], index, index];
                 break;
             case 4:
-                shape = 4;  // Circle
+                shape = 4;  // Solid Rectangle
+                currentShape = [renderType[1], index, index];
+                break;
+            case 5:
+                shape = 5;  // Line Circle
+                currentShape = [renderType[0], index, index];
+                break;
+            case 6:
+                shape = 6;  // Solid Circle
+                currentShape = [renderType[1], index, index];
                 break;
             default:
                 shape = 0;
         }
-        //
         clickCount = 0;
-        // createBuffer();
-        // render();
-
+        shapeArray.push(currentShape);
+        shapeArraySize++;
     });
 
     // Draw points and Graphics
@@ -157,9 +187,6 @@ window.onload = function init() {
     }
     function draw(points) {
 
-        // console.log("point Added: ");
-        // console.log(points);
-        // console.log(erase);
         if(!erase){
             updateBuffer(points, color);
 
@@ -192,6 +219,7 @@ window.onload = function init() {
                 break;
         }
     }
+
     function drawRectangle(points){
         if(clickCount % 2 == 0) {
             firstClick = points;
@@ -218,15 +246,73 @@ window.onload = function init() {
             drawBlankPoint();
         }
     }
+    function drawSolidRectangle(points){
+        if(clickCount % 2 == 0) {
+            firstClick = points;
+        } else{
+            // Draw a rectangle
+            var p1 = firstClick;
+            var p2 = vec2(firstClick[0], points[1]);
+            var p3 = vec2(points[0], firstClick[1]);
+            var p4 = points;
+            // firstClick = null;
+
+            /*
+             Pattern for Square
+             p1 -> p2
+             p2 -> p3
+             p3 -> p4
+             */
+            draw(p1);
+            draw(p2);
+            draw(p3);
+            draw(p4);
+            drawBlankPoint();
+
+        }
+    }
+
+    function drawCircle(point) {
+        if(clickCount % 2 == 0){
+            firstClick = point;
+        } else{
+            var organ =  firstClick;
+
+            // Get Distance
+            var x = organ[0] - point[0];
+            var y = organ[1] - point[1];
+            var dist =  distance(x, y);
+
+            x = organ[0];
+            y = organ[1];
+
+            for(var i =0; i <= 360; i++){
+                // Spin Circle
+                var radian = toRadian(i);
+                var pt = vec2(x + dist * Math.cos(radian), y + dist * Math.sin(radian) );
+                // Draw Points
+                draw(pt);
+            }
+            drawBlankPoint();
+        }
+
+    }
+
+    function distance(x, y) {
+        return Math.sqrt(x * x + y * y);
+    }
+    function toRadian(degree) {
+        return degree * Math.PI / 180;
+    }
 
 
     // EVENT Listeners
     // Mouse Clicks
     var gc = document.getElementById("gl-canvas");
     gc.addEventListener("mousedown", function (event) {
-        undo.push(index);
-        var points = getPoints(event);
+        // undo.push(index);
 
+        var points = getPoints(event);
 
         switch (shape) {
             case 0: // Lines
@@ -239,17 +325,27 @@ window.onload = function init() {
                 drawLineTriangle(points);
                 break;
             case 2: // Solid Triangle
+
                 draw(points);
-            break;
-            case 3: // Solid Triangle
+                if (clickCount % 3 == 2)
+                    drawBlankPoint();
+                  break;
+            case 3: // Line Rectangle
                 drawRectangle(points);
+                break;
+            case 4: // Solid Rectangle
+                drawSolidRectangle(points);
+            break;
+            case 5: // Line Circle
+                drawCircle(points);
+            break;
+            case 6: // Solid Circle
                 break;
             default:
                 alert("An error occurred");
         }
-        clickCount++;
-        undoCount++;
 
+            clickCount++;
     });
 
 
@@ -261,6 +357,7 @@ window.onload = function init() {
 
     });
 
+    //  BUFFER
     function createBuffer() {
         // Load the data into the GPU
         vBuffer = gl.createBuffer();
@@ -283,16 +380,9 @@ window.onload = function init() {
         gl.enableVertexAttribArray(vColor);
 
     }
-
-
     // Use buffer subdata:  memory location, offset, data
     function updateBuffer(pointArray, colorArray) {
-        // console.log("Update buffer");
-        // console.log("Buffer Array: ");
-        // console.log(gl.ARRAY_BUFFER);
-
-
-        // Pointer Array
+            // Pointer Array
         gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
         gl.bufferSubData(gl.ARRAY_BUFFER, 8 * index, flatten(pointArray));
 
@@ -300,38 +390,34 @@ window.onload = function init() {
         gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
         gl.bufferSubData(gl.ARRAY_BUFFER, 16 * index, flatten(colorArray));
 
+        // gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer);
 
-        console.log("index: " + index);
         index++;
+        shapeArray[shapeArraySize][2] = index;
     }
 
-
     render();
+
 };
 
 
 function render() {
     gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.drawArrays(gl.LINE_STRIP, 0, index);
 
-    // switch (shape) {
-    //     case 0:  // Line
-    //     case 1:  // Wire
-    //         gl.drawArrays(gl.LINE_STRIP, 0, index);
-    //         break;
-    //     case 2:  // Solid TRIANGLES
-    //         gl.drawArrays(gl.TRIANGLES, 0, index);
-    //         break;
-    //     case 3:  // RECTANGLES
-    //         gl.drawArrays(gl.TRIANGLE_STRIP, 0, index);
-    //         break;
-    //     case 4:
-    //         gl.drawArrays(gl.TRIANGLE_FAN, 0, index);
-    //         break;
-    //     default:
-    //         gl.drawArrays(gl.LINE_STRIP, 0, index);
-    //
-    // }
+    for(var i = 0; i <= shapeArraySize; i++){
+        // gl.drawArrays(gl.LINE_STRIP, shapeArray[i][1], shapeArray[i][2] + 1);
+        gl.drawArrays(shapeArray[i][0], shapeArray[i][1], shapeArray[i][2] + 1);
+
+        console.log("Shapes array " + i);
+        console.log("index:" + index );
+        console.log("shapes array size:" + shapeArraySize );
+        console.log(shapeArray[i]);
+        console.log(shapeArray[i][0]);
+        console.log(shapeArray[i][1]);
+        console.log(shapeArray[i][2]);
+    }
+
+
     window.requestAnimationFrame(render);
 
 }
