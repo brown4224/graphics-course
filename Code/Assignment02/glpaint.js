@@ -6,12 +6,6 @@ var clickCount = 0;
 var firstClick;
 var erase = false;
 
-// var bufferStartRead = 0
-var bufferSize = 4 * 100000;
-var varray = new Array(bufferSize);
-var carray = new Array(2 * bufferSize);
-
-
 // Colors
 var red = vec4(1, 0, 0, 1);
 var green = vec4(0, 1, 0, 1);
@@ -20,12 +14,17 @@ var background = vec4(0.8, 0.8, 0.8, 1.0);
 var color = red;   // Current Color
 
 //Shapes
-var lineSize = 1;
+var lineSize = 1.0;
 var shape = 0;   // line, triangle, circle
 var currentRender;
 var shapeArray = [];
 var shapeArraySize = 0;
 
+
+// Buffer Array
+var bufferSize = 4 * 100000;
+var varray = new Array(bufferSize);
+var carray = new Array(2 * bufferSize);
 
 // Buffer
 var vBuffer;
@@ -41,10 +40,6 @@ window.onload = function init() {
     if (!gl) {
         alert("WebGL isn't available");
     }
-
-
-
-    // currentShape = [renderType[0], index];  //render type, start, end
     //  Configure WebGL
     gl.viewport(0, 0, canvas.width, canvas.height);
     gl.clearColor(background[0], background[1], background[2], background[3]);
@@ -58,7 +53,6 @@ window.onload = function init() {
     console.log("Sending to Buffer");
     createBuffer();
     currentRender = gl.LINE_STRIP;
-
 
 
     // Buttions
@@ -91,15 +85,12 @@ window.onload = function init() {
         };
     document.getElementById("button-undo").onclick =
         function () {
-        console.log('undo');
-            console.log('Shapes Array: ');
-            console.log(shapeArray);
-
-            if(shapeArraySize > 0){
+            console.log('undo');
+            if (shapeArraySize > 0) {
                 var lastIndex = shapeArray.pop();
                 shapeArraySize--;
 
-                if(shapeArraySize > 0)
+                if (shapeArraySize > 0)
                     index = lastIndex[1];
                 else
                     index = 0;
@@ -107,7 +98,6 @@ window.onload = function init() {
                 if (clickCount > 0)
                     clickCount--;
             }
-
         };
 
 
@@ -162,27 +152,31 @@ window.onload = function init() {
                 currentRender = gl.LINE_STRIP;
                 break;
             case 1:
-                shape = 1;  // Line Triangle
-                currentRender = gl.LINE_STRIP;
+                shape = 1;  // Line Width
+                currentRender = gl.TRIANGLE_STRIP;
                 break;
             case 2:
-                shape = 2;  // Solid Triangle
-                currentRender = gl.TRIANGLE_STRIP;
+                shape = 2;  // Line Triangle
+                currentRender = gl.LINE_STRIP;
                 break;
             case 3:
-                shape = 3;  // Line Rectangle
-                currentRender = gl.LINE_STRIP;
-                break;
-            case 4:
-                shape = 4;  // Solid Rectangle
+                shape = 3;  // Solid Triangle
                 currentRender = gl.TRIANGLE_STRIP;
                 break;
-            case 5:
-                shape = 5;  // Line Circle
+            case 4:
+                shape = 4;  // Line Rectangle
                 currentRender = gl.LINE_STRIP;
                 break;
+            case 5:
+                shape = 5;  // Solid Rectangle
+                currentRender = gl.TRIANGLE_STRIP;
+                break;
             case 6:
-                shape = 6;  // Solid Circle
+                shape = 6;  // Line Circle
+                currentRender = gl.LINE_STRIP;
+                break;
+            case 7:
+                shape = 7;  // Solid Circle
                 currentRender = gl.TRIANGLE_FAN;
                 break;
             default:
@@ -193,8 +187,15 @@ window.onload = function init() {
 
     // Draw points and Graphics
     function getPoints(event) {
-        return vec2(2 * event.clientX / canvas.width - 1,
-            2 * (canvas.height - event.clientY) / canvas.height - 1);
+
+        // offset window scrolling
+        var top = this.scrollY;
+        var left = this.scrollX;
+        top *= 2;
+        left *= 2;
+
+        return vec2(((2 * event.clientX + left) / canvas.width - 1),
+            (((2 * (canvas.height - event.clientY)) - top   ) / canvas.height - 1));
     }
     function drawBlankPoint() {
         var points = vec2(NaN, NaN);
@@ -204,13 +205,25 @@ window.onload = function init() {
     }
     function draw(points) {
 
-        if(!erase){
+        if (!erase) {
             updateBuffer(points, color);
 
         } else {
             updateBuffer(points, background);
         }
 
+    }
+    function drawLineWidth(lastPoint, currentPoint) {
+        offset = 0.005 * lineSize;
+        var pt1 = vec2(lastPoint[0] - offset, lastPoint[1] + offset);
+        var pt2 = vec2(lastPoint[0] - offset, lastPoint[1] - offset);
+        var pt3 = vec2(currentPoint[0] + offset, currentPoint[1] + offset);
+        var pt4 = vec2(currentPoint[0] + offset, currentPoint[1] - offset);
+
+        draw(pt1);
+        draw(pt3);
+        draw(pt2);
+        draw(pt4);
     }
     function drawLineTriangle(points) {
         /*
@@ -236,10 +249,10 @@ window.onload = function init() {
                 break;
         }
     }
-    function drawRectangle(points){
-        if(clickCount % 2 == 0) {
+    function drawRectangle(points) {
+        if (clickCount % 2 == 0) {
             firstClick = points;
-        } else{
+        } else {
             // Draw a rectangle
             var p1 = firstClick;
             var p2 = vec2(firstClick[0], points[1]);
@@ -248,24 +261,28 @@ window.onload = function init() {
             // firstClick = null;
 
             /*
-            Pattern for Square
-            p1 -> p2
-            p2 -> p3
-            p3 -> p4
-            p4 -> p1
-            nan
+             Pattern for Square
+             p1 -> p2
+             p2 -> p3
+             p3 -> p4
+             p4 -> p1
+             nan
              */
-            draw(p1); draw(p2);  // line 1
-            draw(p2); draw(p3);  // line 2
-            draw(p3); draw(p4);  // line 3
-            draw(p4); draw(p1);  // line 4
+            draw(p1);
+            draw(p2);  // line 1
+            draw(p2);
+            draw(p3);  // line 2
+            draw(p3);
+            draw(p4);  // line 3
+            draw(p4);
+            draw(p1);  // line 4
             drawBlankPoint();
         }
     }
-    function drawSolidRectangle(points){
-        if(clickCount % 2 == 0) {
+    function drawSolidRectangle(points) {
+        if (clickCount % 2 == 0) {
             firstClick = points;
-        } else{
+        } else {
             // Draw a rectangle
             var p1 = firstClick;
             var p2 = vec2(firstClick[0], points[1]);
@@ -288,27 +305,27 @@ window.onload = function init() {
         }
     }
     function drawCircle(point) {
-        if(clickCount % 2 == 0){
+        if (clickCount % 2 == 0) {
             firstClick = point;
-            if(shape == 6){ // Circle Sold
+            if (shape == 6) { // Circle Sold
                 // Place first click in center and use traingle fan
                 draw(firstClick);
             }
-        } else{
-            var organ =  firstClick;
+        } else {
+            var organ = firstClick;
 
             // Get Distance
             var x = organ[0] - point[0];
             var y = organ[1] - point[1];
-            var dist =  distance(x, y);
+            var dist = distance(x, y);
 
             x = organ[0];
             y = organ[1];
 
-            for(var i =0; i <= 360; i++){
+            for (var i = 0; i <= 360; i++) {
                 // Spin Circle
                 var radian = toRadian(i);
-                var pt = vec2(x + dist * Math.cos(radian), y + dist * Math.sin(radian) );
+                var pt = vec2(x + dist * Math.cos(radian), y + dist * Math.sin(radian));
                 // Draw Points
                 draw(pt);
             }
@@ -328,11 +345,11 @@ window.onload = function init() {
     // Mouse Clicks
     var gc = document.getElementById("gl-canvas");
     gc.addEventListener("mousedown", function (event) {
-        console.log("Mouse Down.  Add Point");
         shapeArray.push([currentRender, index, 0]);
         shapeArraySize++;
 
         var points = getPoints(event);
+        var lastPoint = points;  // Line witdth
 
         switch (shape) {
             case 0: // Lines
@@ -341,25 +358,32 @@ window.onload = function init() {
                     draw(points);
                 };
                 break;
-            case 1: // Line Triangle
+            case 1: // Line Width
+                gc.onmousemove = function (event) {
+                    points = getPoints(event);
+                    drawLineWidth(lastPoint, points);
+                    lastPoint = points;
+                };
+                break;
+            case 2: // Line Triangle
                 drawLineTriangle(points);
                 break;
-            case 2: // Solid Triangle
+            case 3: // Solid Triangle
 
                 draw(points);
                 if (clickCount % 3 == 2)
                     drawBlankPoint();
-                  break;
-            case 3: // Line Rectangle
+                break;
+            case 4: // Line Rectangle
                 drawRectangle(points);
                 break;
-            case 4: // Solid Rectangle
+            case 5: // Solid Rectangle
                 drawSolidRectangle(points);
-            break;
-            case 5: // Line Circle
+                break;
+            case 6: // Line Circle
                 drawCircle(points);
-            break;
-            case 6: // Solid Circle
+                break;
+            case 7: // Solid Circle
                 drawCircle(points);
                 // drawSolidCircle(points);
                 break;
@@ -367,10 +391,10 @@ window.onload = function init() {
                 alert("An error occurred");
         }
     });
-
-
     gc.addEventListener("mouseup", function (e) {
-        if (shape == 0) {
+        // Line & Line-Width
+        // Add blank point to break line segment
+        if (shape <= 1) {
             canvas.onmousemove = null;
             drawBlankPoint();
         }
@@ -401,7 +425,7 @@ window.onload = function init() {
 
     }
     function updateBuffer(pointArray, colorArray) {
-            // Pointer Array
+        // Pointer Array
         gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
         gl.bufferSubData(gl.ARRAY_BUFFER, 8 * index, flatten(pointArray));
 
@@ -411,20 +435,13 @@ window.onload = function init() {
         index++;
         shapeArray[shapeArraySize - 1][2]++;
     }
-
     render();
-
 };
-
 
 function render() {
     gl.clear(gl.COLOR_BUFFER_BIT);
-    for(var i = 0; i < shapeArraySize; i++){
+    for (var i = 0; i < shapeArraySize; i++) {
         gl.drawArrays(shapeArray[i][0], shapeArray[i][1], shapeArray[i][2] );
     }
     window.requestAnimationFrame(render);
 }
-
-
-
-

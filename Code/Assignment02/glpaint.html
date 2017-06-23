@@ -10,11 +10,9 @@ varying vec4 fColor;
 void
 main()
 {
-	gl_PointSize = 1.0;
+
     gl_Position = vPosition;
         fColor = vColor;
-
-
 }
 
 
@@ -71,14 +69,15 @@ Paint or Erase
 <div>
     <div>
         Shape Type
-        <select id="menu-shape" size="=4">
-            <option value="0">Line</option>
-            <option value="1">Line Triangle</option>
-            <option value="2">Solid Triangle</option>
-            <option value="3">Line Rectangle</option>
-            <option value="4">Solid Rectangle</option>
-            <option value="5">Line Circle</option>
-            <option value="6">Solid Circle</option>
+        <select id="menu-shape" size="=8">
+            <option value="0">Line-standard</option>
+            <option value="1">Line-Width</option>
+            <option value="2">Line Triangle</option>
+            <option value="3">Solid Triangle</option>
+            <option value="4">Line Rectangle</option>
+            <option value="5">Solid Rectangle</option>
+            <option value="6">Line Circle</option>
+            <option value="7">Solid Circle</option>
         </select>
     </div>
     <!--Finish Later-->
