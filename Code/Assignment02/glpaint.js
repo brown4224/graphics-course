@@ -1,14 +1,16 @@
 var gl;
 var index = 0;
-// var undo = [];
+var undo = [];
 var undoCount = 0;
 var clickCount = 0;
 var firstClick;
 var erase = false;
 
+// var bufferStartRead = 0
 var bufferSize = 4 * 100000;
 var varray = new Array(bufferSize);
 var carray = new Array(2 * bufferSize);
+
 
 // Colors
 var red = vec4(1, 0, 0, 1);
@@ -20,7 +22,8 @@ var color = red;   // Current Color
 //Shapes
 var lineSize = 1;
 var shape = 0;   // line, triangle, circle
-var renderType;
+// var renderType;
+var currentRender;
 var shapeArray = [];
 var shapeArraySize = 0;
 
@@ -51,14 +54,13 @@ window.onload = function init() {
     var program = initShaders(gl, "vertex-shader", "fragment-shader");
     gl.useProgram(program);
 
-
-
-
+    // Create buffer and start array of objects
+    // Shapes array allows for dynamic rendering
     console.log("Sending to Buffer");
     createBuffer();
-    renderType = [gl.LINE_STRIP, gl.TRIANGLE_STRIP];
-    shapeArray.push([renderType[0], index, index]);
-    // shapeArraySize++;
+    currentRender = gl.LINE_STRIP;
+    shapeArray.push([currentRender, index, index]);   // Keeps track of (render type, start, end)
+
 
 
     // Buttions
@@ -72,21 +74,43 @@ window.onload = function init() {
         };
     document.getElementById("button-canvas-clear").onclick =
         function () {
+            // Zero Variables
+            undo = [];
+            shapeArray = [];
             index = 0;
+            undoCount = 0;
+            clickCount = 0;
+            firstClick = 0;
+            shapeArraySize = 0;
+
+            // Create new buffer
+            shapeArray.push([currentRender, 0, 0]);
+            // createBuffer();
+
         };
     document.getElementById("button-undo").onclick =
         function () {
         console.log('undo');
-            // if (shapeArraySize > 0) {
-            //     shapeArray.pop();
-            //     shapeArraySize--;
-            //     index = shapeArray[shapeArraySize][2];
-                // undoCount--;
-                // if(shapeArray[shapeArraySize][1] < index ){
-                //     shapeArray.pop();
-                //     index--;
-                // }
-                // shapeArray[shapeArraySize][2] = index;
+        if (undoCount > 0) {
+
+            index = undo.pop();
+            // Check if the shape changed change
+            if(index < shapeArray[shapeArraySize][1]){
+                shapeArray.pop();
+                shapeArraySize--;
+            }
+
+            undoCount--;
+            shapeArray[shapeArraySize][2] = index;
+
+
+
+
+            if (clickCount > 0)
+                clickCount--;
+
+        }
+
 
 
         };
@@ -136,41 +160,50 @@ window.onload = function init() {
     document.getElementById("menu-shape").addEventListener("click", function () {
 
 
-        var currentShape;
+        // var currentShape;
         switch (this.selectedIndex) {
             case 0:
                 shape = 0;  // Line
-                currentShape = [renderType[0], index, index];
+                currentRender = gl.LINE_STRIP;
+                // currentShape = [renderType[0], index, index];
                 break;
             case 1:
                 shape = 1;  // Line Triangle
-                currentShape = [renderType[0], index, index ];
+                currentRender = gl.LINE_STRIP;
+                // currentShape = [renderType[0], index, index ];
                 break;
             case 2:
                 shape = 2;  // Solid Triangle
-                currentShape = [renderType[1], index, index];
+                currentRender = gl.TRIANGLE_STRIP;
+                // currentShape = [renderType[1], index, index];
                 break;
             case 3:
                 shape = 3;  // Line Rectangle
-                currentShape = [renderType[0], index, index];
+                currentRender = gl.LINE_STRIP;
+                // currentShape = [renderType[0], index, index];
                 break;
             case 4:
                 shape = 4;  // Solid Rectangle
-                currentShape = [renderType[1], index, index];
+                currentRender = gl.TRIANGLE_STRIP;
+                // currentShape = [renderType[1], index, index];
                 break;
             case 5:
                 shape = 5;  // Line Circle
-                currentShape = [renderType[0], index, index];
+                currentRender = gl.LINE_STRIP;
+                // currentShape = [renderType[0], index, index];
                 break;
             case 6:
                 shape = 6;  // Solid Circle
-                currentShape = [renderType[1], index, index];
+                currentRender = gl.LINE_STRIP;
+                // currentShape = [renderType[1], index, index];
                 break;
             default:
                 shape = 0;
         }
         clickCount = 0;
-        shapeArray.push(currentShape);
+        // shapeArray.push(currentShape);
+        shapeArray.push([currentRender, index, index]);
+
         shapeArraySize++;
     });
 
@@ -310,7 +343,7 @@ window.onload = function init() {
     // Mouse Clicks
     var gc = document.getElementById("gl-canvas");
     gc.addEventListener("mousedown", function (event) {
-        // undo.push(index);
+        undo.push(index);
 
         var points = getPoints(event);
 
@@ -346,6 +379,7 @@ window.onload = function init() {
         }
 
             clickCount++;
+            undoCount++;
     });
 
 
@@ -390,7 +424,6 @@ window.onload = function init() {
         gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
         gl.bufferSubData(gl.ARRAY_BUFFER, 16 * index, flatten(colorArray));
 
-        // gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer);
 
         index++;
         shapeArray[shapeArraySize][2] = index;
@@ -406,7 +439,7 @@ function render() {
 
     for(var i = 0; i <= shapeArraySize; i++){
         // gl.drawArrays(gl.LINE_STRIP, shapeArray[i][1], shapeArray[i][2] + 1);
-        gl.drawArrays(shapeArray[i][0], shapeArray[i][1], shapeArray[i][2] + 1);
+        gl.drawArrays(shapeArray[i][0], shapeArray[i][1], shapeArray[i][2] );
 
         console.log("Shapes array " + i);
         console.log("index:" + index );
