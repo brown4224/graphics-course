@@ -329,7 +329,7 @@ window.onload = function init() {
     var gc = document.getElementById("gl-canvas");
     gc.addEventListener("mousedown", function (event) {
         console.log("Mouse Down.  Add Point");
-        shapeArray.push([currentRender, index, 1]);
+        shapeArray.push([currentRender, index, 0]);
         shapeArraySize++;
 
         var points = getPoints(event);
