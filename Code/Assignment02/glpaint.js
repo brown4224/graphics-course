@@ -1,3 +1,12 @@
+/**
+ * Sean McGlincy
+ * Graphics
+ * Assignment 2
+ *
+ * This uses a line which uses a line segment and a line with that uses tiangle_strip
+ */
+
+
 var gl;
 var index = 0;
 var undo = [];
@@ -58,13 +67,12 @@ window.onload = function init() {
 
 
     // Buttions
-    document.getElementById("button-canvas-width").onclick =
+    document.getElementById("button-canvas").onclick =
         function () {
-            canvas.width +=canvas.width;
-        };
-    document.getElementById("button-canvas-height").onclick =
-        function () {
-            canvas.height *= 1.10;
+            canvas.width += 100;
+            canvas.height += 100;
+            gl.viewport(0, 0, canvas.width, canvas.height);
+
         };
     document.getElementById("button-canvas-clear").onclick =
         function () {
@@ -76,10 +84,6 @@ window.onload = function init() {
             clickCount = 0;
             firstClick = 0;
             shapeArraySize = 0;
-
-            // Create new buffer
-            // varray = new Array(bufferSize);
-            // carray = new Array(2 * bufferSize);
 
             shapeArray.push([currentRender, 0, 0]);
             createBuffer();
@@ -198,7 +202,6 @@ window.onload = function init() {
 
         top *= 2;
         left *= 2;
-window.getel
         return vec2(((2 * event.clientX + left) /  canvas.width  - 1),
             (((2 * (canvas.height - event.clientY)) - top   ) / canvas.height - 1));
     }
