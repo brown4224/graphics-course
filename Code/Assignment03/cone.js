@@ -1,12 +1,14 @@
-var verticalPosition = [];
+var c_verticalPosition = [];
 var normalData = [];
 var textureCoordData = [];
 
 
 var c_radius = 0.5;
+var c_height = 8 * c_radius;
 var c_color = 0;
-var degree = 10;
-var organ = vec4(0.0, 0.0, 0.0, 1);
+var c_degree = 10;
+var c_organ = vec4(0.0, 0.0, 0.0, 1);
+var c_top = add(c_organ, vec4(0, c_height, 0, 1));
 
 
 
@@ -15,27 +17,79 @@ function drawCone() {
 
 // Generate Points
     var c_count = 0;
-    var c_radian = degree * Math.PI / 180;
+    var c_radian = c_degree * Math.PI / 180;
     var fullCircle = 2 * Math.PI;
+
+    // Make Circle
     for(var i=0; i<= fullCircle; i += c_radian){
         var x = Math.cos(i);
-        var y = Math.sin(i);
-        var z = c_radius;
+        var y = 0;  // zero height
+        var z = Math.sin(i);
 
-        // verticalPosition.push(vec4(x, y, z, 1));
         var pt = vec4(x, y, z, 1);
+        c_verticalPosition.push(pt);
 
         pointsArray.push(pt);
         sphereColor();
         if (c_count > 0){
-            pointsArray.push(organ);
+            pointsArray.push(c_organ);
             sphereColor();
             pointsArray.push(pt);
             sphereColor();
         }
-
         c_count++;
     }
+
+    pointsArray.pop();
+    colorsArray.pop();
+
+
+    var c_first = c_verticalPosition[c_count -1];
+    var c_last = c_verticalPosition[0];
+
+
+    // Connect last triangle to first
+    pointsArray.push(c_last);
+    sphereColor();
+    pointsArray.push(c_top);
+    sphereColor();
+    pointsArray.push(c_first);
+    sphereColor();
+    pointsArray.push(c_first);
+    sphereColor();
+    c_verticalPosition.pop();
+    c_count--;
+
+
+
+    for (var i = 0; i< c_count; i++){
+        var pt = c_verticalPosition.pop();
+        pointsArray.push(pt);
+        sphereColor();
+
+        pointsArray.push(c_top);
+        sphereColor();
+        pointsArray.push(pt);
+        sphereColor();
+
+
+
+        //Works
+        // pointsArray.push(pt);
+        // sphereColor();
+        //
+        // if (i > 0){
+        //     pointsArray.push(c_top);
+        //     sphereColor();
+        //     pointsArray.push(pt);
+        //     sphereColor();
+        // }
+    }
+
+
+    // Clear array
+    c_verticalPosition = [];
+
 
 
 
@@ -125,12 +179,12 @@ function drawCone() {
 //         }
 
 
-    if(debug){
-        console.log("verticalPosition: " + verticalPosition.length);
-        console.log(verticalPosition);
-        console.log("points array: " + pointsArray.length);
-        console.log(pointsArray);
-    }
+    // if(debug){
+    //     console.log("verticalPosition: " + verticalPosition.length);
+    //     console.log(verticalPosition);
+    //     console.log("points array: " + pointsArray.length);
+    //     console.log(pointsArray);
+    // }
 
 
 

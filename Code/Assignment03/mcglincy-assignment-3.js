@@ -17,7 +17,7 @@ var trans = [ 1.0, 0.0, 0.0 ];
 
 //   Perspective
 var near = 0.1;
-var far = 3.0;
+var far = 30.0;
 var radius = 4.0;
 var theta  = 0.0;
 var phi    = 0.0;
@@ -75,8 +75,8 @@ window.onload = function init() {
 
     // Imported from Cube File
     // drawCube();
-    drawSphere();
-    // drawCone();
+    // drawSphere();
+    drawCone();
 
 
     var cBuffer = gl.createBuffer();
