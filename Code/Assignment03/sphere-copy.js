@@ -4,7 +4,7 @@ var textureCoordData = [];
 
 var latitudeBands = 30;
 var longitudeBands = 30;
-var s_radius = 0.5;
+radius = 2;
 var vertexColors = [
     vec4( 0.0, 0.0, 0.0, 1.0 ),  // black
     vec4( 1.0, 0.0, 0.0, 1.0 ),  // red
@@ -22,24 +22,50 @@ function drawSphere() {
 
 // Generate Points
     for(var latNumber = 0; latNumber <= latitudeBands; latNumber++){
-        var s_theta = latNumber * Math.PI / latitudeBands;
-        var sinTheta = Math.sin(s_theta);
-        var cosTheta = Math.cos(s_theta);
+        var theta = latNumber * Math.PI / latitudeBands;
+        var sinTheta = Math.sin(theta);
+        var cosTheta = Math.cos(theta);
 
         for(var longNumber = 0; longNumber <= longitudeBands; longNumber++){
-            var s_phi = longNumber * 2 * Math.PI / longitudeBands;
-            var sinPhi = Math.sin(s_phi);
-            var cosPhi = Math.cos(s_phi);
+            var phi = longNumber * 2 * Math.PI / longitudeBands;
+            var sinPhi = Math.sin(phi);
+            var cosPhi = Math.cos(phi);
 
             var x = cosPhi * sinTheta;
             var y = cosTheta;
             var z = sinTheta * sinPhi;
 
-            verticalPosition.push([s_radius * x, s_radius * y, s_radius * z, 1.0]);
+            // var u = 1 - (longNumber /longitudeBands);
+            // var v = 1- (latNumber / latitudeBands);
+            //
+            // normalData.push(x);
+            // normalData.push(y);
+            // normalData.push(z);
+            //
+            // textureCoordData.push(u);
+            // textureCoordData.push(v);
+
+            verticalPosition.push([radius * x, radius * y, radius * z, 1.0]);
+
             // Test
-            // verticalPosition.push(s_radius * x);
-            // verticalPosition.push(s_radius * y);
-            // verticalPosition.push(s_radius * z);
+            // verticalPosition.push(radius * x);
+            // verticalPosition.push(radius * y);
+            // verticalPosition.push(radius * z);
+
+            // var c =0;
+            // pointsArray.push(first);
+            // colorsArray.push(vertexColors[c]);
+            // pointsArray.push(second);
+            // colorsArray.push(vertexColors[c]);
+            // pointsArray.push(first + 1);
+            // colorsArray.push(vertexColors[c]);
+            //
+            // pointsArray.push(second);
+            // colorsArray.push(vertexColors[c]);
+            // pointsArray.push(second + 1);
+            // colorsArray.push(vertexColors[c]);
+            // pointsArray.push(first + 1);
+            // colorsArray.push(vertexColors[c]);
 
         }
     }
@@ -63,7 +89,7 @@ function drawSphere() {
              * d = second ++
              */
 
-            var ptColor = 1;
+            var ptColor =0;
             var a = first;
             var b = first + 1;
             var c = second;
@@ -87,12 +113,28 @@ function drawSphere() {
             colorsArray.push(vertexColors[ptColor]);
             colorsArray.push(vertexColors[ptColor]);
 
+
+
+
+
+            // indexData.push(first);
+            // indexData.push(second);
+            // indexData.push(first + 1);
+            //
+            // indexData.push(second);
+            // indexData.push(second + 1);
+            // indexData.push(first + 1);
+
+            // Push First Triangle
+            // pointsArray.push(first);
+            // pointsArray.push(second);
+            // pointsArray.push(first + 1);
+            //
+            // pointsArray.push(second);
+            // pointsArray.push(second + 1);
+            // pointsArray.push(first + 1);
         }
     }
-    console.log("verticalPosition: " + verticalPosition.length);
-    console.log(verticalPosition);
-    console.log("points array: " + pointsArray.length);
-    console.log(pointsArray);
 
 
 }

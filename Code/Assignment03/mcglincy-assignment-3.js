@@ -9,8 +9,14 @@ var NumVertices  = 36;
 var pointsArray = [];
 var colorsArray = [];
 
+// Movement
+var axis = 0;
+var rotateAxis = [ 0.0, 0.0, 0.0 ]; //Theta X,Y,Z
+var trans = [ 1.0, 0.0, 0.0 ];
+
+
 //   Perspective
-var near = 0.3;
+var near = 0.1;
 var far = 3.0;
 var radius = 4.0;
 var theta  = 0.0;
@@ -28,10 +34,10 @@ var modelView;
 var projection;
 
 // Eye
-var eye;
-// var eye = vec3(0.0, -2.0, -3.5);
+// var eye;
+var eye = vec3(0.0, 0.0, 3.0);
 const at = vec3(0.0, 0.0, 0.0);
-const up = vec3(0.0, 1.5, 0.0);
+const up = vec3(0.0, 1.1, 0.0);
 
 
 
@@ -59,8 +65,8 @@ window.onload = function init() {
     gl.useProgram( program );
 
     // Imported from Cube File
-    colorCube();
-
+    // colorCube();
+    drawSphere();
     var cBuffer = gl.createBuffer();
     gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer );
     gl.bufferData( gl.ARRAY_BUFFER, flatten(colorsArray), gl.STATIC_DRAW );
@@ -77,8 +83,10 @@ window.onload = function init() {
     gl.vertexAttribPointer( vPosition, 4, gl.FLOAT, false, 0, 0 );
     gl.enableVertexAttribArray( vPosition );
 
+    // Camera
     modelView = gl.getUniformLocation( program, "modelView" );
     projection = gl.getUniformLocation( program, "projection" );
+
 
 // buttons for viewing parameters
     // document.getElementById("Button1").onclick = function(){near  *= 1.1; far *= 1.1;};
@@ -89,6 +97,16 @@ window.onload = function init() {
     // document.getElementById("Button6").onclick = function(){theta -= dr;};
     // document.getElementById("Button7").onclick = function(){phi += dr;};
     // document.getElementById("Button8").onclick = function(){phi -= dr;};
+    document.getElementById("button-canvas").onclick =
+        function () {
+            canvas.width += 100;
+            canvas.height += 100;
+            gl.viewport(0, 0, canvas.width, canvas.height);
+
+        };
+
+
+
 
     render();
 };
@@ -97,13 +115,24 @@ window.onload = function init() {
 var render = function(){
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    eye = vec3(radius*Math.sin(theta)*Math.cos(phi), radius*Math.sin(theta)*Math.sin(phi), radius*Math.cos(theta));
+    // eye = vec3(radius*Math.sin(theta)*Math.cos(phi), radius*Math.sin(theta)*Math.sin(phi), radius*Math.cos(theta));
     mvMatrix = lookAt(eye, at , up);
     pMatrix = perspective(fovy, aspect, near, far);
+
+    // Matrix Manipulation
+    rotateAxis[axis] += 2.0;
+    trans[0] += 0.1;
+    // var mvMatrix = mult(mvMatrix, rotateX(rotateAxis[axis] ));
+    // var mvMatrix = mult(mvMatrix, rotate(rotateAxis[axis], [x, y, z]) );
+
+
+
 
     gl.uniformMatrix4fv( modelView, false, flatten(mvMatrix) );
     gl.uniformMatrix4fv( projection, false, flatten(pMatrix) );
 
-    gl.drawArrays( gl.TRIANGLES, 0, NumVertices );
+    gl.drawArrays( gl.TRIANGLES, 0, pointsArray.length );
+
+    // gl.drawArrays( gl.TRIANGLES, 0, NumVertices );
     requestAnimFrame(render);
 }

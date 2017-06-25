@@ -25,6 +25,9 @@ function colorCube()
     quad( 6, 5, 1, 2 );
     quad( 4, 5, 6, 7 );
     quad( 5, 4, 0, 1 );
+
+    console.log("points array: " + pointsArray.length);
+    console.log(pointsArray);
 }
 var vertices = [
     vec4(-0.5, -0.5,  0.5, 1.0),
