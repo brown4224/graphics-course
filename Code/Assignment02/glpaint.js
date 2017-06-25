@@ -85,7 +85,6 @@ window.onload = function init() {
             firstClick = 0;
             shapeArraySize = 0;
 
-            shapeArray.push([currentRender, 0, 0]);
             createBuffer();
 
         };
@@ -249,6 +248,7 @@ window.onload = function init() {
 
                 break;
             case 2:
+                history();
                 draw(firstClick); // click 0:  write a
 
                 draw(secondClick);
@@ -270,6 +270,7 @@ window.onload = function init() {
                 secondClick = points;
                 break;
             case 2:
+                history();
                 draw(firstClick);
                 draw(secondClick);
                 draw(points);
@@ -296,6 +297,7 @@ window.onload = function init() {
              p4 -> p1
              nan
              */
+            history();
             draw(p1);
             draw(p2);  // line 1
             draw(p2);
@@ -324,6 +326,7 @@ window.onload = function init() {
              p2 -> p3
              p3 -> p4
              */
+            history();
             draw(p1);
             draw(p2);
             draw(p3);
@@ -335,11 +338,15 @@ window.onload = function init() {
     function drawCircle(point) {
         if (clickCount % 2 == 0) {
             firstClick = point;
-            if (shape == 6) { // Circle Sold
+
+        } else {
+            history();
+            if (shape == 7) { // Circle Sold
                 // Place first click in center and use traingle fan
                 draw(firstClick);
             }
-        } else {
+
+
             var organ = firstClick;
 
             // Get Distance
@@ -368,25 +375,31 @@ window.onload = function init() {
         return degree * Math.PI / 180;
     }
 
+    function history() {
+        // Works with the undo function and render()
+        // Call when drawing each shape.
+        shapeArray.push([currentRender, index, 0]);
+        shapeArraySize++;
+    }
 
     // EVENT Listeners
     // Mouse Clicks
     var gc = document.getElementById("gl-canvas");
     gc.addEventListener("mousedown", function (event) {
-        shapeArray.push([currentRender, index, 0]);
-        shapeArraySize++;
 
         var points = getPoints(event);
         var lastPoint = points;  // Line witdth
 
         switch (shape) {
             case 0: // Lines
+                history();
                 gc.onmousemove = function (event) {
                     points = getPoints(event);
                     draw(points);
                 };
                 break;
             case 1: // Line Width
+                history();
                 gc.onmousemove = function (event) {
                     points = getPoints(event);
                     drawLineWidth(lastPoint, points);
@@ -416,7 +429,7 @@ window.onload = function init() {
                 alert("An error occurred");
         }
     });
-    gc.addEventListener("mouseup", function (e) {
+    document.addEventListener("mouseup", function (e) {
         // Line & Line-Width
         // Add blank point to break line segment
         if (shape <= 1) {
