@@ -3,8 +3,8 @@
 var canvas;
 var gl;
 
-var NumVertices  = 36;
 
+var debug = true;
 // Arrays
 var pointsArray = [];
 var colorsArray = [];
@@ -40,7 +40,16 @@ const at = vec3(0.0, 0.0, 0.0);
 const up = vec3(0.0, 1.1, 0.0);
 
 
-
+var vertexColors = [
+    vec4( 0.0, 0.0, 0.0, 1.0 ),  // black
+    vec4( 1.0, 0.0, 0.0, 1.0 ),  // red
+    vec4( 1.0, 1.0, 0.0, 1.0 ),  // yellow
+    vec4( 0.0, 1.0, 0.0, 1.0 ),  // green
+    vec4( 0.0, 0.0, 1.0, 1.0 ),  // blue
+    vec4( 1.0, 0.0, 1.0, 1.0 ),  // magenta
+    vec4( 0.0, 1.0, 1.0, 1.0 ),  // cyan
+    vec4( 1.0, 1.0, 1.0, 1.0 ),  // white
+];
 
 window.onload = function init() {
 
@@ -65,8 +74,11 @@ window.onload = function init() {
     gl.useProgram( program );
 
     // Imported from Cube File
-    // colorCube();
+    // drawCube();
     drawSphere();
+    // drawCone();
+
+
     var cBuffer = gl.createBuffer();
     gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer );
     gl.bufferData( gl.ARRAY_BUFFER, flatten(colorsArray), gl.STATIC_DRAW );
@@ -123,7 +135,7 @@ var render = function(){
     rotateAxis[axis] += 2.0;
     trans[0] += 0.1;
     // var mvMatrix = mult(mvMatrix, rotateX(rotateAxis[axis] ));
-    // var mvMatrix = mult(mvMatrix, rotate(rotateAxis[axis], [x, y, z]) );
+    var mvMatrix = mult(mvMatrix, rotateY(rotateAxis[axis] ));
 
 
 

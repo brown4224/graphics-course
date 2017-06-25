@@ -17,7 +17,7 @@ function quad(a, b, c, d) {
     colorsArray.push(vertexColors[a]);
 }
 
-function colorCube()
+function drawCube()
 {
     quad( 1, 0, 3, 2 );
     quad( 2, 3, 7, 6 );
@@ -26,8 +26,11 @@ function colorCube()
     quad( 4, 5, 6, 7 );
     quad( 5, 4, 0, 1 );
 
-    console.log("points array: " + pointsArray.length);
-    console.log(pointsArray);
+    if(debug){
+        console.log("points array: " + pointsArray.length);
+        console.log(pointsArray);
+    }
+
 }
 var vertices = [
     vec4(-0.5, -0.5,  0.5, 1.0),
@@ -38,28 +41,4 @@ var vertices = [
     vec4(-0.5,  0.5, -0.5, 1.0),
     vec4(0.5,  0.5, -0.5, 1.0),
     vec4( 0.5, -0.5, -0.5, 1.0)
-];
-
-
-
-// var vertices = [
-//     vec4(-0.5, -0.5,  1.5, 1.0),
-//     vec4(-0.5,  0.5,  1.5, 1.0),
-//     vec4(0.5,  0.5,  1.5, 1.0),
-//     vec4(0.5, -0.5,  1.5, 1.0),
-//     vec4(-0.5, -0.5, 0.5, 1.0),
-//     vec4(-0.5,  0.5, 0.5, 1.0),
-//     vec4(0.5,  0.5, 0.5, 1.0),
-//     vec4( 0.5, -0.5, 0.5, 1.0)
-// ];
-
-var vertexColors = [
-    vec4( 0.0, 0.0, 0.0, 1.0 ),  // black
-    vec4( 1.0, 0.0, 0.0, 1.0 ),  // red
-    vec4( 1.0, 1.0, 0.0, 1.0 ),  // yellow
-    vec4( 0.0, 1.0, 0.0, 1.0 ),  // green
-    vec4( 0.0, 0.0, 1.0, 1.0 ),  // blue
-    vec4( 1.0, 0.0, 1.0, 1.0 ),  // magenta
-    vec4( 0.0, 1.0, 1.0, 1.0 ),  // cyan
-    vec4( 1.0, 1.0, 1.0, 1.0 ),  // white
 ];
