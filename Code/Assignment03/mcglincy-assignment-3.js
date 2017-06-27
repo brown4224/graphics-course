@@ -37,7 +37,7 @@ var projection;
 // var eye;
 var eye = vec3(0.0, 0.0, 3.0);
 const at = vec3(0.0, 0.0, 0.0);
-const up = vec3(0.0, 1.1, 0.0);
+const up = vec3(0.0, 1.0, 0.0);
 
 
 var vertexColors = [
@@ -77,27 +77,39 @@ window.onload = function init() {
     // drawCube();
     // drawSphere();
     drawCone();
+    createBuffer();
+
+    drawSphere();
+    createBuffer();
+
+    // // Camera
+    // modelView = gl.getUniformLocation( program, "modelView" );
+    // projection = gl.getUniformLocation( program, "projection" );
 
 
-    var cBuffer = gl.createBuffer();
-    gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer );
-    gl.bufferData( gl.ARRAY_BUFFER, flatten(colorsArray), gl.STATIC_DRAW );
+    function createBuffer() {
+        var cBuffer = gl.createBuffer();
+        gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer );
+        gl.bufferData( gl.ARRAY_BUFFER, flatten(colorsArray), gl.STATIC_DRAW );
 
-    var vColor = gl.getAttribLocation( program, "vColor" );
-    gl.vertexAttribPointer( vColor, 4, gl.FLOAT, false, 0, 0 );
-    gl.enableVertexAttribArray( vColor);
+        var vColor = gl.getAttribLocation( program, "vColor" );
+        gl.vertexAttribPointer( vColor, 4, gl.FLOAT, false, 0, 0 );
+        gl.enableVertexAttribArray( vColor);
 
-    var vBuffer = gl.createBuffer();
-    gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer );
-    gl.bufferData( gl.ARRAY_BUFFER, flatten(pointsArray), gl.STATIC_DRAW );
+        var vBuffer = gl.createBuffer();
+        gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer );
+        gl.bufferData( gl.ARRAY_BUFFER, flatten(pointsArray), gl.STATIC_DRAW );
 
-    var vPosition = gl.getAttribLocation( program, "vPosition" );
-    gl.vertexAttribPointer( vPosition, 4, gl.FLOAT, false, 0, 0 );
-    gl.enableVertexAttribArray( vPosition );
+        var vPosition = gl.getAttribLocation( program, "vPosition" );
+        gl.vertexAttribPointer( vPosition, 4, gl.FLOAT, false, 0, 0 );
+        gl.enableVertexAttribArray( vPosition );
 
-    // Camera
-    modelView = gl.getUniformLocation( program, "modelView" );
-    projection = gl.getUniformLocation( program, "projection" );
+        // Camera
+        modelView = gl.getUniformLocation( program, "modelView" );
+        projection = gl.getUniformLocation( program, "projection" );
+
+    }
+
 
 
 // buttons for viewing parameters
@@ -134,17 +146,15 @@ var render = function(){
     // Matrix Manipulation
     rotateAxis[axis] += 2.0;
     trans[0] += 0.1;
-    // var mvMatrix = mult(mvMatrix, rotateX(rotateAxis[axis] ));
-    var mvMatrix = mult(mvMatrix, rotateY(rotateAxis[axis] ));
-
-
-
+    // var mvMatrix;
+    mvMatrix = mult(mvMatrix, translate(0.0, -c_height / 4, 0.0) );
+    mvMatrix = mult(mvMatrix, rotateX(rotateAxis[axis] ));
+    mvMatrix = mult(mvMatrix, rotateY(rotateAxis[axis] ));
 
     gl.uniformMatrix4fv( modelView, false, flatten(mvMatrix) );
     gl.uniformMatrix4fv( projection, false, flatten(pMatrix) );
 
     gl.drawArrays( gl.TRIANGLES, 0, pointsArray.length );
 
-    // gl.drawArrays( gl.TRIANGLES, 0, NumVertices );
     requestAnimFrame(render);
 }
