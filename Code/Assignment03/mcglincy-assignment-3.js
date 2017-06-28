@@ -7,6 +7,11 @@ var gl;
 var debug = true;
 // Arrays
 var pointsArray = [];
+var shapeArray = [];  // CUBE, SPHERE, CONE: [START, END POINTS]
+var renderCube = 0;
+var renderSphere = 1;
+var renderCone = 2;
+var historyArray = [];
 var colorsArray = [];
 
 // Movement
@@ -73,42 +78,49 @@ window.onload = function init() {
     var program = initShaders( gl, "vertex-shader", "fragment-shader" );
     gl.useProgram( program );
 
-    // Imported from Cube File
+    // // Imported from Cube File
+    // var startIndex = pointsArray.length;
     // drawCube();
+    // shapeArrayHelper(startIndex, pointsArray.length);
+    //
+    // startIndex = pointsArray.length;
     // drawSphere();
-    drawCone();
-    createBuffer();
+    // shapeArrayHelper(startIndex, pointsArray.length);
+    //
+    // startIndex = pointsArray.length;
+    // drawCone();
+    // shapeArrayHelper(startIndex, pointsArray.length);
 
-    drawSphere();
-    createBuffer();
+    // Imported from Cube File
+    // Pass Draw Functions into helper function
+    shapeMapper(drawCube, pointsArray.length);
+    shapeMapper(drawSphere, pointsArray.length);
+    shapeMapper(drawCone, pointsArray.length);
 
-    // // Camera
-    // modelView = gl.getUniformLocation( program, "modelView" );
-    // projection = gl.getUniformLocation( program, "projection" );
 
 
-    function createBuffer() {
-        var cBuffer = gl.createBuffer();
-        gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer );
-        gl.bufferData( gl.ARRAY_BUFFER, flatten(colorsArray), gl.STATIC_DRAW );
 
-        var vColor = gl.getAttribLocation( program, "vColor" );
-        gl.vertexAttribPointer( vColor, 4, gl.FLOAT, false, 0, 0 );
-        gl.enableVertexAttribArray( vColor);
+    var cBuffer = gl.createBuffer();
+    gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer );
+    gl.bufferData( gl.ARRAY_BUFFER, flatten(colorsArray), gl.STATIC_DRAW );
 
-        var vBuffer = gl.createBuffer();
-        gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer );
-        gl.bufferData( gl.ARRAY_BUFFER, flatten(pointsArray), gl.STATIC_DRAW );
+    var vColor = gl.getAttribLocation( program, "vColor" );
+    gl.vertexAttribPointer( vColor, 4, gl.FLOAT, false, 0, 0 );
+    gl.enableVertexAttribArray( vColor);
 
-        var vPosition = gl.getAttribLocation( program, "vPosition" );
-        gl.vertexAttribPointer( vPosition, 4, gl.FLOAT, false, 0, 0 );
-        gl.enableVertexAttribArray( vPosition );
+    var vBuffer = gl.createBuffer();
+    gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer );
+    gl.bufferData( gl.ARRAY_BUFFER, flatten(pointsArray), gl.STATIC_DRAW );
 
-        // Camera
-        modelView = gl.getUniformLocation( program, "modelView" );
-        projection = gl.getUniformLocation( program, "projection" );
+    var vPosition = gl.getAttribLocation( program, "vPosition" );
+    gl.vertexAttribPointer( vPosition, 4, gl.FLOAT, false, 0, 0 );
+    gl.enableVertexAttribArray( vPosition );
 
-    }
+    // Camera
+    modelView = gl.getUniformLocation( program, "modelView" );
+    projection = gl.getUniformLocation( program, "projection" );
+
+
 
 
 
@@ -146,15 +158,44 @@ var render = function(){
     // Matrix Manipulation
     rotateAxis[axis] += 2.0;
     trans[0] += 0.1;
-    // var mvMatrix;
-    mvMatrix = mult(mvMatrix, translate(0.0, -c_height / 4, 0.0) );
-    mvMatrix = mult(mvMatrix, rotateX(rotateAxis[axis] ));
-    mvMatrix = mult(mvMatrix, rotateY(rotateAxis[axis] ));
 
-    gl.uniformMatrix4fv( modelView, false, flatten(mvMatrix) );
-    gl.uniformMatrix4fv( projection, false, flatten(pMatrix) );
+    // First Object
+    mvMatrix = mult(mvMatrix, translate(-0.5, 0.0, 0.0) );
+    // mvMatrix = mult(mvMatrix, rotateY(rotateAxis[2] ));
+    // mvMatrix = mult(mvMatrix, rotateY(rotateAxis[1] ));
+    mvMatrix = mult(mvMatrix, rotateX(rotateAxis[0] ));
+    //
+    renderObject(shapeArray[renderSphere]);
 
-    gl.drawArrays( gl.TRIANGLES, 0, pointsArray.length );
+    // Second Object
+    // mvMatrix = mult(mvMatrix, scalem(0.5, 0.5, 0.5) );
+
+
+    mvMatrix = lookAt(eye, at , up);
+    mvMatrix = mult(mvMatrix, translate(0.5, -0.5, 0.0) );
+    // mvMatrix = mult(mvMatrix, translate(0.0, -0.5, 0.0) );
+    // mvMatrix = mult(mvMatrix, rotateY(rotateAxis[2] ));
+    // mvMatrix = mult(mvMatrix, rotateY(rotateAxis[1] ));
+    mvMatrix = mult(mvMatrix, rotateX(rotateAxis[0] ));
+    renderObject(shapeArray[renderCone]);
+
 
     requestAnimFrame(render);
+}
+
+function renderObject(indexArray) {
+    gl.uniformMatrix4fv( modelView, false, flatten(mvMatrix) );
+    gl.uniformMatrix4fv( projection, false, flatten(pMatrix) );
+    gl.drawArrays( gl.TRIANGLES, indexArray[0], indexArray[1] );
+}
+
+// Pass a function 'funk' which draws a shape
+// Map the starting point and offset to shapes array
+function shapeMapper(funk,  startIndex) {
+    funk();
+    var offset = pointsArray.length - startIndex;
+    shapeArray.push([startIndex, offset]);
+
+
+
 }

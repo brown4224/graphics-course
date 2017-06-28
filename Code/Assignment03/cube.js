@@ -1,7 +1,4 @@
-// SHAPES
-
 // CUBE
-
 function quad(a, b, c, d) {
     pointsArray.push(vertices[a]);
     colorsArray.push(vertexColors[a]);

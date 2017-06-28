@@ -1,13 +1,11 @@
 var c_radius = 0.5;
-var c_height = 2;
+var c_height = 2.0;
 
 function drawCone() {
-
+    // Variables
     var c_verticalPosition = [];
     var normalData = [];
     var textureCoordData = [];
-
-
 
     var c_color = 0;
     var c_degree = 5;
@@ -22,9 +20,9 @@ function drawCone() {
 
     // Make Circle
     for(var i=0; i<= fullCircle; i += c_radian){
-        var x = Math.cos(i);
-        var y = 0;  // zero height
-        var z = Math.sin(i);
+        var x = c_radius * Math.cos(i);
+        var y = c_radius * 0;  // zero height
+        var z = c_radius * Math.sin(i);
 
         var pt = vec4(x, y, z, 1);
         c_verticalPosition.push(pt);
@@ -76,7 +74,6 @@ function drawCone() {
     }
 
     c_verticalPosition = [];
-
 
     function addColor() {
         colorsArray.push(vertexColors[c_color]);

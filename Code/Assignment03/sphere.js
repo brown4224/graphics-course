@@ -11,7 +11,6 @@ var s_color = 0;
 
 
 function drawSphere() {
-
 // Generate Points
     for(var latNumber = 0; latNumber <= s_latitudeBands; latNumber++){
         var s_theta = latNumber * Math.PI / s_latitudeBands;
@@ -89,7 +88,5 @@ function drawSphere() {
         console.log("points array: " + pointsArray.length);
         console.log(pointsArray);
     }
-
-
 
 }
