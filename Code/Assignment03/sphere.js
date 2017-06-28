@@ -1,6 +1,6 @@
 var s_verticalPosition = [];
-var normalData = [];
-var textureCoordData = [];
+//var normalData = [];
+//var textureCoordData = [];
 
 var s_latitudeBands = 30;
 var s_longitudeBands = 30;
@@ -62,14 +62,25 @@ function drawSphere() {
             pointsArray.push(s_verticalPosition[c]);
             pointsArray.push(s_verticalPosition[b]);
 
+            normalsArray.push(a);
+            normalsArray.push(c);
+            normalsArray.push(b);
+
+
+
             sphereColor();
             sphereColor();
             sphereColor();
+
 
             // Second Triangle
             pointsArray.push(s_verticalPosition[c]);
             pointsArray.push(s_verticalPosition[d]);
             pointsArray.push(s_verticalPosition[b]);
+
+            normalsArray.push(c);
+            normalsArray.push(d);
+            normalsArray.push(b);
 
             sphereColor();
             sphereColor();

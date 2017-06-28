@@ -1,17 +1,37 @@
 // CUBE
 function quad(a, b, c, d) {
+
+    // Normal Vector
+    var t1 = subtract(vertices[b], vertices[a]);
+    var t2 = subtract(vertices[c], vertices[b]);
+    var normal = cross(t1, t2);
+    var normal = vec3(normal);
+
+    //  Push onto array
     pointsArray.push(vertices[a]);
     colorsArray.push(vertexColors[a]);
+    normalsArray.push(normal);
+
     pointsArray.push(vertices[b]);
     colorsArray.push(vertexColors[a]);
+    normalsArray.push(normal);
+
     pointsArray.push(vertices[c]);
     colorsArray.push(vertexColors[a]);
+    normalsArray.push(normal);
+
     pointsArray.push(vertices[a]);
     colorsArray.push(vertexColors[a]);
+    normalsArray.push(normal);
+
     pointsArray.push(vertices[c]);
     colorsArray.push(vertexColors[a]);
+    normalsArray.push(normal);
+
     pointsArray.push(vertices[d]);
     colorsArray.push(vertexColors[a]);
+    normalsArray.push(normal);
+
 }
 
 function drawCube()
