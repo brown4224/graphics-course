@@ -51,7 +51,7 @@ void main()
 
     gl_Position = projection *modelView * vPosition;
     fColor = vColor * (ambient + diffuse +specular);
-//    fColor =  (ambient + diffuse +specular);
+//   fColor =  (ambient + diffuse +specular);
 
     fColor.a = 1.0;
 }

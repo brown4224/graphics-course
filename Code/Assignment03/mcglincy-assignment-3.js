@@ -189,11 +189,11 @@ var render = function(){
 
     // // First Object
     // mvMatrix = mult(mvMatrix, translate(-0.5, 0.0, 0.0) );
-    mvMatrix = mult(mvMatrix, rotateZ(rotateAxis[2] ));
-    mvMatrix = mult(mvMatrix, rotateY(rotateAxis[1] ));
-    mvMatrix = mult(mvMatrix, rotateX(rotateAxis[0] ));
-    //
-    renderObject(shapeArray[renderSphere]);
+    // mvMatrix = mult(mvMatrix, rotateZ(rotateAxis[2] ));
+    // mvMatrix = mult(mvMatrix, rotateY(rotateAxis[1] ));
+    // mvMatrix = mult(mvMatrix, rotateX(rotateAxis[0] ));
+    // //
+    // renderObject(shapeArray[renderSphere]);
     //
     // // Second Object
     // // mvMatrix = mult(mvMatrix, scalem(0.5, 0.5, 0.5) );
@@ -202,10 +202,10 @@ var render = function(){
     // mvMatrix = lookAt(eye, at , up);
     // mvMatrix = mult(mvMatrix, translate(0.5, -0.5, 0.0) );
     // // mvMatrix = mult(mvMatrix, translate(0.0, -0.5, 0.0) );
-    // // mvMatrix = mult(mvMatrix, rotateZ(rotateAxis[2] ));
-    // mvMatrix = mult(mvMatrix, rotateY(rotateAxis[1] ));
-    // mvMatrix = mult(mvMatrix, rotateX(rotateAxis[0] ));
-    // renderObject(shapeArray[renderCone]);
+    mvMatrix = mult(mvMatrix, rotateZ(rotateAxis[2] ));
+    mvMatrix = mult(mvMatrix, rotateY(rotateAxis[1] ));
+    mvMatrix = mult(mvMatrix, rotateX(rotateAxis[0] ));
+    renderObject(shapeArray[renderCone]);
 
 
     requestAnimFrame(render);
