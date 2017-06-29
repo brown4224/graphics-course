@@ -4,7 +4,7 @@ var canvas;
 var gl;
 
 
-var debug = true;
+var debug = false;
 // Arrays
 var pointsArray = [];
 var normalsArray = [];
@@ -182,9 +182,9 @@ var render = function(){
     trans[0] += 0.1;
 
     // Cube
-    // mvMatrix = mult(mvMatrix, rotateY(rotateAxis[1] ));
-    // mvMatrix = mult(mvMatrix, rotateX(rotateAxis[0] ));
-    // renderObject(shapeArray[renderCube]);
+    mvMatrix = mult(mvMatrix, rotateY(rotateAxis[1] ));
+    mvMatrix = mult(mvMatrix, rotateX(rotateAxis[0] ));
+    renderObject(shapeArray[renderCube]);
 
 
     // // First Object
@@ -192,7 +192,7 @@ var render = function(){
     // mvMatrix = mult(mvMatrix, rotateZ(rotateAxis[2] ));
     // mvMatrix = mult(mvMatrix, rotateY(rotateAxis[1] ));
     // mvMatrix = mult(mvMatrix, rotateX(rotateAxis[0] ));
-    // //
+    // // //
     // renderObject(shapeArray[renderSphere]);
     //
     // // Second Object
@@ -202,10 +202,10 @@ var render = function(){
     // mvMatrix = lookAt(eye, at , up);
     // mvMatrix = mult(mvMatrix, translate(0.5, -0.5, 0.0) );
     // // mvMatrix = mult(mvMatrix, translate(0.0, -0.5, 0.0) );
-    mvMatrix = mult(mvMatrix, rotateZ(rotateAxis[2] ));
-    mvMatrix = mult(mvMatrix, rotateY(rotateAxis[1] ));
-    mvMatrix = mult(mvMatrix, rotateX(rotateAxis[0] ));
-    renderObject(shapeArray[renderCone]);
+    // mvMatrix = mult(mvMatrix, rotateZ(rotateAxis[2] ));
+    // mvMatrix = mult(mvMatrix, rotateY(rotateAxis[1] ));
+    // mvMatrix = mult(mvMatrix, rotateX(rotateAxis[0] ));
+    // renderObject(shapeArray[renderCone]);
 
 
     requestAnimFrame(render);

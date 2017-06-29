@@ -4,8 +4,8 @@ var c_height = 2.0;
 function drawCone() {
     // Variables
     var c_verticalPosition = [];
-    var normalData = [];
-    var textureCoordData = [];
+    //var normalData = [];
+    //var textureCoordData = [];
 
     var c_color = 0;
     var c_degree = 5;
@@ -18,6 +18,12 @@ function drawCone() {
     var c_radian = c_degree * Math.PI / 180;
     var fullCircle = 2 * Math.PI;
 
+    // Make normals for bottom of cone (CIRCLE)
+    var a = vec4(c_radius, 0, 0, 1);
+    var b = c_organ;
+    var c = vec4(0, c_radius, 0, 1);
+    var normal = makeNormal(a, b, c);
+
     // Make Circle
     var first = pointsArray.length;
     for(var i=0; i<= fullCircle; i += c_radian){
@@ -29,16 +35,15 @@ function drawCone() {
         c_verticalPosition.push(pt);
 
         pointsArray.push(pt);
-        // normalsArray.push(pt);
+        normalsArray.push(normal);
         addColor();
 
         if (c_count > 0){
             pointsArray.push(c_organ);
             pointsArray.push(pt);
 
-
-            // normalsArray.push(pt);
-            // normalsArray.push(pt);
+            normalsArray.push(normal);
+            normalsArray.push(normal);
 
             addColor();
             addColor();
@@ -51,28 +56,6 @@ function drawCone() {
     // normalsArray.pop();
     colorsArray.pop();
 
-    // Make normals for bottom of cone
-    var a = vec4(c_radius, 0, 0, 1);
-    var b = c_organ;
-    var c = vec4(0, c_radius, 0, 1);
-    var normal = makeNormal(a, b, c);
-    for (i = 0; i< last - first; i++){
-        normalsArray.push(normal);
-    }
-
-    // var c_size = pointsArray.length;
-    // for (var i = first; i< c_size; i++){
-    //     var a = pointsArray[i -1];
-    //     var b = c_organ;
-    //     var c = pointsArray[i];
-    // }
-    //
-    //
-    // var c = pointsArray[i -1];
-    // var b = c_organ;
-    // var a = pointsArray[i];
-
-
     var c_first = c_verticalPosition[c_count -1];
     var c_last = c_verticalPosition[0];
 
@@ -84,18 +67,17 @@ function drawCone() {
     // Connect last triangle to first
     pointsArray.push(c_last);
     normalsArray.push(normal);
-    // normalsArray.push(c_last);
     addColor();
+
     pointsArray.push(c_top);
     normalsArray.push(normal);
-    // normalsArray.push(top);
     addColor();
+
     pointsArray.push(c_first);
     normalsArray.push(normal);
-    // normalsArray.push(c_first);
     addColor();
+
     pointsArray.push(c_first);
-    // normalsArray.push(c_first);
     var previous = c_first;
     addColor();
     c_verticalPosition.pop();
@@ -109,24 +91,18 @@ function drawCone() {
 
         pointsArray.push(pt);
         normalsArray.push(normal);
-
-        // normalsArray.push(pt);
         addColor();
 
         pointsArray.push(c_top);
         normalsArray.push(normal);
-
-        // normalsArray.push(c_top);
         addColor();
 
         pointsArray.push(pt);
         normalsArray.push(normal);
-
-        // normalsArray.push(pt);
         addColor();
         previous = pt;
-
     }
+
 
     function makeNormal(a, b, c) {
         // Normal Vector
@@ -142,7 +118,5 @@ function drawCone() {
         colorsArray.push(vertexColors[c_color]);
         c_color = ++c_color % 3;
     }
-
-
 }
 
