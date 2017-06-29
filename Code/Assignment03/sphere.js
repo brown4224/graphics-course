@@ -1,14 +1,8 @@
 var s_verticalPosition = [];
-//var normalData = [];
-//var textureCoordData = [];
-
 var s_latitudeBands = 30;
 var s_longitudeBands = 30;
 var s_radius = 0.5;
 var s_color = 0;
-
-
-
 
 function drawSphere() {
 // Generate Points
@@ -27,7 +21,6 @@ function drawSphere() {
             var z = sinTheta * sinPhi;
 
             s_verticalPosition.push([s_radius * x, s_radius * y, s_radius * z, 1.0]);
-
         }
     }
 
@@ -50,7 +43,6 @@ function drawSphere() {
              * d = second ++
              */
 
-
             var a = s_verticalPosition[first];
             var b = s_verticalPosition[first + 1];
             var c = s_verticalPosition[second];
@@ -62,8 +54,6 @@ function drawSphere() {
             var normal = cross(t1, t2);
             var normal = vec3(normal);
 
-
-
             // First Triangle
             pointsArray.push(a);
             pointsArray.push(c);
@@ -73,18 +63,9 @@ function drawSphere() {
             normalsArray.push(normal);
             normalsArray.push(normal);
 
-
-
-            // normalsArray.push(a);
-            // normalsArray.push(c);
-            // normalsArray.push(b);
-
-
-
             sphereColor();
             sphereColor();
             sphereColor();
-
 
             // Second Triangle
             pointsArray.push(c);
@@ -94,10 +75,6 @@ function drawSphere() {
             normalsArray.push(normal);
             normalsArray.push(normal);
             normalsArray.push(normal);
-
-            // normalsArray.push(c);
-            // normalsArray.push(d);
-            // normalsArray.push(b);
 
             sphereColor();
             sphereColor();

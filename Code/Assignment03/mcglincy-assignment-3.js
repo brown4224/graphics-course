@@ -42,14 +42,14 @@ var projection;
 
 // Eye
 // var eye;
-var eye = vec3(0.0, 0.0, 3.0);
+var eye = vec3(0.0, 0.0, 8.0);
 const at = vec3(0.0, 0.0, 0.0);
 const up = vec3(0.0, 1.0, 0.0);
 
 // Lighting
 var ambientColor, diffuseColor, specularColor;
 
-var lightPosition = vec4(5.0, 0.0, 5.0, 0.0 );
+var lightPosition = vec4(5.0, 0.0, 10.0, 0.0 );
 var lightAmbient = vec4( 0.75, 0.75, 0.75, 1.0 );
 // var lightAmbient = vec4( 1.0, 1.0, 1.0, 1.0 );
 var lightDiffuse = vec4( 1.0, 1.0, 1.0, 1.0);
@@ -84,7 +84,7 @@ window.onload = function init() {
     gl.enable(gl.DEPTH_TEST);
 
 
-    var program = initShaders( gl, "vertex-shader", "fragment-shader" );
+    var program = initShaders( gl, "light-shader",  "fragment-shader" );
     gl.useProgram( program );
 
     ///////////////  DRAW SHAPES   //////////////////////
@@ -171,7 +171,7 @@ var render = function(){
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     // eye = vec3(radius*Math.sin(theta)*Math.cos(phi), radius*Math.sin(theta)*Math.sin(phi), radius*Math.cos(theta));
-    mvMatrix = lookAt(eye, at , up);
+    var look = lookAt(eye, at , up);
     pMatrix = perspective(fovy, aspect, near, far);
 
     // Matrix Manipulation
@@ -182,30 +182,29 @@ var render = function(){
     trans[0] += 0.1;
 
     // Cube
+    mvMatrix = mult(look, scalem(1.0, 1.0, 1.0) );
+    mvMatrix = mult(mvMatrix, translate(-2, 2, 0.0) );
+    mvMatrix = mult(mvMatrix, rotateZ(rotateAxis[2] ));
     mvMatrix = mult(mvMatrix, rotateY(rotateAxis[1] ));
     mvMatrix = mult(mvMatrix, rotateX(rotateAxis[0] ));
     renderObject(shapeArray[renderCube]);
 
 
-    // // First Object
-    // mvMatrix = mult(mvMatrix, translate(-0.5, 0.0, 0.0) );
-    // mvMatrix = mult(mvMatrix, rotateZ(rotateAxis[2] ));
-    // mvMatrix = mult(mvMatrix, rotateY(rotateAxis[1] ));
-    // mvMatrix = mult(mvMatrix, rotateX(rotateAxis[0] ));
-    // // //
-    // renderObject(shapeArray[renderSphere]);
-    //
+    //  Sphere
+    mvMatrix = mult(look, scalem(1.0, 1.0, 1.0) );
+    mvMatrix = mult(mvMatrix, translate(-2, 0.0, 0.0) );
+    mvMatrix = mult(mvMatrix, rotateZ(rotateAxis[2] ));
+    mvMatrix = mult(mvMatrix, rotateY(rotateAxis[1] ));
+    mvMatrix = mult(mvMatrix, rotateX(rotateAxis[0] ));
+    renderObject(shapeArray[renderSphere]);
+
     // // Second Object
-    // // mvMatrix = mult(mvMatrix, scalem(0.5, 0.5, 0.5) );
-    //
-    //
-    // mvMatrix = lookAt(eye, at , up);
-    // mvMatrix = mult(mvMatrix, translate(0.5, -0.5, 0.0) );
-    // // mvMatrix = mult(mvMatrix, translate(0.0, -0.5, 0.0) );
-    // mvMatrix = mult(mvMatrix, rotateZ(rotateAxis[2] ));
-    // mvMatrix = mult(mvMatrix, rotateY(rotateAxis[1] ));
-    // mvMatrix = mult(mvMatrix, rotateX(rotateAxis[0] ));
-    // renderObject(shapeArray[renderCone]);
+    mvMatrix = mult(look, scalem(1.0, 1.0, 1.0) );
+    mvMatrix = mult(mvMatrix, translate(-2, -2, 0.0) );
+    mvMatrix = mult(mvMatrix, rotateZ(rotateAxis[2] ));
+    mvMatrix = mult(mvMatrix, rotateY(rotateAxis[1] ));
+    mvMatrix = mult(mvMatrix, rotateX(rotateAxis[0] ));
+    renderObject(shapeArray[renderCone]);
 
 
     requestAnimFrame(render);

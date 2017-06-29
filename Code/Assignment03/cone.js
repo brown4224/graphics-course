@@ -4,9 +4,6 @@ var c_height = 2.0;
 function drawCone() {
     // Variables
     var c_verticalPosition = [];
-    //var normalData = [];
-    //var textureCoordData = [];
-
     var c_color = 0;
     var c_degree = 5;
     var c_organ = vec4(0.0, 0.0, 0.0, 1);
@@ -25,7 +22,6 @@ function drawCone() {
     var normal = makeNormal(a, b, c);
 
     // Make Circle
-    var first = pointsArray.length;
     for(var i=0; i<= fullCircle; i += c_radian){
         var x = c_radius * Math.cos(i);
         var y = c_radius * 0;  // zero height
@@ -50,10 +46,8 @@ function drawCone() {
         }
         c_count++;
     }
-    var last = pointsArray.length;
     // Remove Extra Point
     pointsArray.pop();
-    // normalsArray.pop();
     colorsArray.pop();
 
     var c_first = c_verticalPosition[c_count -1];
@@ -104,8 +98,8 @@ function drawCone() {
     }
 
 
+    // Normal Vector
     function makeNormal(a, b, c) {
-        // Normal Vector
         var t1 = subtract(b, a);
         var t2 = subtract(c, b);
         var normal = cross(t1, t2);
