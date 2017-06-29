@@ -51,20 +51,33 @@ function drawSphere() {
              */
 
 
-            var a = first;
-            var b = first + 1;
-            var c = second;
-            var d = second + 1;
+            var a = s_verticalPosition[first];
+            var b = s_verticalPosition[first + 1];
+            var c = s_verticalPosition[second];
+            var d = s_verticalPosition[second + 1];
+
+            // Normal Vector
+            var t1 = subtract(b,a);
+            var t2 = subtract(c,b);
+            var normal = cross(t1, t2);
+            var normal = vec3(normal);
+
 
 
             // First Triangle
-            pointsArray.push(s_verticalPosition[a]);
-            pointsArray.push(s_verticalPosition[c]);
-            pointsArray.push(s_verticalPosition[b]);
+            pointsArray.push(a);
+            pointsArray.push(c);
+            pointsArray.push(b);
 
-            normalsArray.push(a);
-            normalsArray.push(c);
-            normalsArray.push(b);
+            normalsArray.push(normal);
+            normalsArray.push(normal);
+            normalsArray.push(normal);
+
+
+
+            // normalsArray.push(a);
+            // normalsArray.push(c);
+            // normalsArray.push(b);
 
 
 
@@ -74,13 +87,17 @@ function drawSphere() {
 
 
             // Second Triangle
-            pointsArray.push(s_verticalPosition[c]);
-            pointsArray.push(s_verticalPosition[d]);
-            pointsArray.push(s_verticalPosition[b]);
+            pointsArray.push(c);
+            pointsArray.push(d);
+            pointsArray.push(b);
 
-            normalsArray.push(c);
-            normalsArray.push(d);
-            normalsArray.push(b);
+            normalsArray.push(normal);
+            normalsArray.push(normal);
+            normalsArray.push(normal);
+
+            // normalsArray.push(c);
+            // normalsArray.push(d);
+            // normalsArray.push(b);
 
             sphereColor();
             sphereColor();

@@ -49,8 +49,9 @@ const up = vec3(0.0, 1.0, 0.0);
 // Lighting
 var ambientColor, diffuseColor, specularColor;
 
-var lightPosition = vec4(-5.0, -5.0, -5.0, 0.0 );
-var lightAmbient = vec4( 1.0, 1.0, 1.0, 1.0 );
+var lightPosition = vec4(5.0, 0.0, 5.0, 0.0 );
+var lightAmbient = vec4( 0.75, 0.75, 0.75, 1.0 );
+// var lightAmbient = vec4( 1.0, 1.0, 1.0, 1.0 );
 var lightDiffuse = vec4( 1.0, 1.0, 1.0, 1.0);
 var lightSpecular = vec4( 1.0, 1.0, 1.0, 1.0 );
 
@@ -58,7 +59,6 @@ var materialAmbient = vec4( 1.0, 1.0, 1.0, 1.0 );
 var materialDiffuse = vec4( 1.0, 1.0, 1.0, 1.0);
 var materialSpecular = vec4( 1.0, 1.0, 1.0, 1.0 );
 var materialShininess = 100.0;
-
 
 
 // Color
@@ -92,7 +92,7 @@ window.onload = function init() {
     // Pass Draw Functions into helper function
     shapeMapper(drawCube, pointsArray.length);
     shapeMapper(drawSphere, pointsArray.length);
-    // shapeMapper(drawCone, pointsArray.length);
+    shapeMapper(drawCone, pointsArray.length);
 
     // MODEL VIEW AND CAMERA
     aspect =  canvas.width/canvas.height;
@@ -163,9 +163,6 @@ window.onload = function init() {
 
         };
 
-
-
-
     render();
 };
 
@@ -180,6 +177,8 @@ var render = function(){
     // Matrix Manipulation
     rotateAxis[axis] += 2.0; // x axis
     rotateAxis[1] += 2.0;  // y axis
+    rotateAxis[2] += 2.0;  // y axis
+
     trans[0] += 0.1;
 
     // Cube
@@ -189,9 +188,9 @@ var render = function(){
 
 
     // // First Object
-    mvMatrix = mult(mvMatrix, translate(-0.5, 0.0, 0.0) );
-    // mvMatrix = mult(mvMatrix, rotateY(rotateAxis[2] ));
-    // mvMatrix = mult(mvMatrix, rotateY(rotateAxis[1] ));
+    // mvMatrix = mult(mvMatrix, translate(-0.5, 0.0, 0.0) );
+    mvMatrix = mult(mvMatrix, rotateZ(rotateAxis[2] ));
+    mvMatrix = mult(mvMatrix, rotateY(rotateAxis[1] ));
     mvMatrix = mult(mvMatrix, rotateX(rotateAxis[0] ));
     //
     renderObject(shapeArray[renderSphere]);
@@ -203,8 +202,8 @@ var render = function(){
     // mvMatrix = lookAt(eye, at , up);
     // mvMatrix = mult(mvMatrix, translate(0.5, -0.5, 0.0) );
     // // mvMatrix = mult(mvMatrix, translate(0.0, -0.5, 0.0) );
-    // // mvMatrix = mult(mvMatrix, rotateY(rotateAxis[2] ));
-    // // mvMatrix = mult(mvMatrix, rotateY(rotateAxis[1] ));
+    // // mvMatrix = mult(mvMatrix, rotateZ(rotateAxis[2] ));
+    // mvMatrix = mult(mvMatrix, rotateY(rotateAxis[1] ));
     // mvMatrix = mult(mvMatrix, rotateX(rotateAxis[0] ));
     // renderObject(shapeArray[renderCone]);
 

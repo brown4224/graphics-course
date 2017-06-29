@@ -1,140 +1,68 @@
-var verticalPosition = [];
-var normalData = [];
-var textureCoordData = [];
-
-var latitudeBands = 30;
-var longitudeBands = 30;
-radius = 2;
-var vertexColors = [
-    vec4( 0.0, 0.0, 0.0, 1.0 ),  // black
-    vec4( 1.0, 0.0, 0.0, 1.0 ),  // red
-    vec4( 1.0, 1.0, 0.0, 1.0 ),  // yellow
-    vec4( 0.0, 1.0, 0.0, 1.0 ),  // green
-    vec4( 0.0, 0.0, 1.0, 1.0 ),  // blue
-    vec4( 1.0, 0.0, 1.0, 1.0 ),  // magenta
-    vec4( 0.0, 1.0, 1.0, 1.0 ),  // cyan
-    vec4( 1.0, 1.0, 1.0, 1.0 ),  // white
-];
-
+var va = vec4(0.0, 0.0, -1.0,1);
+var vb = vec4(0.0, 0.942809, 0.333333, 1);
+var vc = vec4(-0.816497, -0.471405, 0.333333, 1);
+var vd = vec4(0.816497, -0.471405, 0.333333,1);
+var numTimesToSubdivide = 3;
+var index = 0;
+var s_color = 0;
 
 
 function drawSphere() {
+    tetrahedron(va, vb, vc, vd, numTimesToSubdivide);
 
-// Generate Points
-    for(var latNumber = 0; latNumber <= latitudeBands; latNumber++){
-        var theta = latNumber * Math.PI / latitudeBands;
-        var sinTheta = Math.sin(theta);
-        var cosTheta = Math.cos(theta);
+}
+function triangle(a, b, c) {
 
-        for(var longNumber = 0; longNumber <= longitudeBands; longNumber++){
-            var phi = longNumber * 2 * Math.PI / longitudeBands;
-            var sinPhi = Math.sin(phi);
-            var cosPhi = Math.cos(phi);
 
-            var x = cosPhi * sinTheta;
-            var y = cosTheta;
-            var z = sinTheta * sinPhi;
 
-            // var u = 1 - (longNumber /longitudeBands);
-            // var v = 1- (latNumber / latitudeBands);
-            //
-            // normalData.push(x);
-            // normalData.push(y);
-            // normalData.push(z);
-            //
-            // textureCoordData.push(u);
-            // textureCoordData.push(v);
+    pointsArray.push(a);
+    pointsArray.push(b);
+    pointsArray.push(c);
 
-            verticalPosition.push([radius * x, radius * y, radius * z, 1.0]);
+    // normals are vectors
 
-            // Test
-            // verticalPosition.push(radius * x);
-            // verticalPosition.push(radius * y);
-            // verticalPosition.push(radius * z);
+    normalsArray.push(a[0],a[1], a[2], 0.0);
+    normalsArray.push(b[0],b[1], b[2], 0.0);
+    normalsArray.push(c[0],c[1], c[2], 0.0);
 
-            // var c =0;
-            // pointsArray.push(first);
-            // colorsArray.push(vertexColors[c]);
-            // pointsArray.push(second);
-            // colorsArray.push(vertexColors[c]);
-            // pointsArray.push(first + 1);
-            // colorsArray.push(vertexColors[c]);
-            //
-            // pointsArray.push(second);
-            // colorsArray.push(vertexColors[c]);
-            // pointsArray.push(second + 1);
-            // colorsArray.push(vertexColors[c]);
-            // pointsArray.push(first + 1);
-            // colorsArray.push(vertexColors[c]);
+    sphereColor();
+    sphereColor();
+    sphereColor();
 
-        }
+    index += 3;
+
+}
+
+
+function divideTriangle(a, b, c, count) {
+    if ( count > 0 ) {
+
+        var ab = mix( a, b, 0.5);
+        var ac = mix( a, c, 0.5);
+        var bc = mix( b, c, 0.5);
+
+        ab = normalize(ab, true);
+        ac = normalize(ac, true);
+        bc = normalize(bc, true);
+
+        divideTriangle( a, ab, ac, count - 1 );
+        divideTriangle( ab, b, bc, count - 1 );
+        divideTriangle( bc, c, ac, count - 1 );
+        divideTriangle( ab, bc, ac, count - 1 );
     }
-
-// Generate Indices
-    var indexData = [];
-    for (var latNumber = 0; latNumber < latitudeBands; latNumber++) {
-        for (var longNumber = 0; longNumber < longitudeBands; longNumber++) {
-            var first = (latNumber * (longitudeBands + 1)) + longNumber;
-            var second = first + longitudeBands + 1;
-
-            /**
-             *
-             * Pattern uses triangles to make square
-             * abc  // First triangle
-             * bdb  // Second triangle
-             *
-             * a = first
-             * b = first++
-             * c = second
-             * d = second ++
-             */
-
-            var ptColor =0;
-            var a = first;
-            var b = first + 1;
-            var c = second;
-            var d = second + 1;
-
-            // First Triangle
-            pointsArray.push(verticalPosition[a]);
-            pointsArray.push(verticalPosition[c]);
-            pointsArray.push(verticalPosition[b]);
-
-            colorsArray.push(vertexColors[ptColor]);
-            colorsArray.push(vertexColors[ptColor]);
-            colorsArray.push(vertexColors[ptColor]);
-
-            // Second Triangle
-            pointsArray.push(verticalPosition[c]);
-            pointsArray.push(verticalPosition[d]);
-            pointsArray.push(verticalPosition[b]);
-
-            colorsArray.push(vertexColors[ptColor]);
-            colorsArray.push(vertexColors[ptColor]);
-            colorsArray.push(vertexColors[ptColor]);
-
-
-
-
-
-            // indexData.push(first);
-            // indexData.push(second);
-            // indexData.push(first + 1);
-            //
-            // indexData.push(second);
-            // indexData.push(second + 1);
-            // indexData.push(first + 1);
-
-            // Push First Triangle
-            // pointsArray.push(first);
-            // pointsArray.push(second);
-            // pointsArray.push(first + 1);
-            //
-            // pointsArray.push(second);
-            // pointsArray.push(second + 1);
-            // pointsArray.push(first + 1);
-        }
+    else {
+        triangle( a, b, c );
     }
+}
 
 
+function tetrahedron(a, b, c, d, n) {
+    divideTriangle(a, b, c, n);
+    divideTriangle(d, c, b, n);
+    divideTriangle(a, d, b, n);
+    divideTriangle(a, c, d, n);
+}
+function sphereColor() {
+    colorsArray.push(vertexColors[s_color]);
+    s_color = ++s_color % 3;
 }

@@ -28,11 +28,17 @@ function drawCone() {
         c_verticalPosition.push(pt);
 
         pointsArray.push(pt);
+        normalsArray.push(pt);
         addColor();
+
         if (c_count > 0){
             pointsArray.push(c_organ);
-            addColor();
             pointsArray.push(pt);
+
+            normalsArray.push(pt);
+            normalsArray.push(pt);
+
+            addColor();
             addColor();
         }
         c_count++;
@@ -40,6 +46,7 @@ function drawCone() {
 
     // Remove Extra Point
     pointsArray.pop();
+    normalsArray.pop();
     colorsArray.pop();
 
 
@@ -49,12 +56,16 @@ function drawCone() {
 
     // Connect last triangle to first
     pointsArray.push(c_last);
+    normalsArray.push(c_last);
     addColor();
     pointsArray.push(c_top);
+    normalsArray.push(top);
     addColor();
     pointsArray.push(c_first);
+    normalsArray.push(c_first);
     addColor();
     pointsArray.push(c_first);
+    normalsArray.push(c_first);
     addColor();
     c_verticalPosition.pop();
     c_count--;
@@ -64,11 +75,15 @@ function drawCone() {
     for (var i = 0; i< c_count; i++){
         var pt = c_verticalPosition.pop();
         pointsArray.push(pt);
+        normalsArray.push(pt);
         addColor();
 
         pointsArray.push(c_top);
+        normalsArray.push(c_top);
         addColor();
+
         pointsArray.push(pt);
+        normalsArray.push(pt);
         addColor();
 
     }
