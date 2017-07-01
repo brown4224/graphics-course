@@ -4,7 +4,7 @@ var canvas;
 var program;
 var gl;
 var shaderFlag;
-var flag;
+var flag = true;
 
 
 
@@ -12,7 +12,6 @@ var debug = false;
 // Arrays
 var pointsArray = [];
 var normalsArray = [];
-// var flag = vec2(0,0);
 
 var shapeArray = [];  // CUBE, SPHERE, CONE: [START, END POINTS]
 var renderCube = 0;
@@ -25,7 +24,6 @@ var colorsArray = [];
 // Movement
 var axis = 0;
 var rotateAxis = [ 0.0, 0.0, 0.0 ]; //Theta X,Y,Z
-var trans = [ 1.0, 0.0, 0.0 ];
 
 
 //   Perspective
@@ -192,8 +190,62 @@ window.onload = function init() {
 
         };
 
+    document.getElementById("menu-shape").addEventListener("click", function () {
+        // Change Cube, Sphere, Cone
+        switch (this.selectedIndex) {
+            case 0:
+                current = renderCube;
+                break;
+            case 1:
+                current = renderSphere;
+                break;
+            case 2:
+                current = renderCone;
+                break;
+            default:
+                current = renderCube;
+        }
+
+    });
+    document.getElementById("menu-shader").addEventListener("click", function () {
+        // Switches Rendering Intent
+        switch (this.selectedIndex) {
+            case 0:
+                flag = true;
+                break;
+            case 1:
+                flag = false;
+                break;
+        }
+
+    });
+
+    document.getElementById("button-create").addEventListener("click", function () {
+        /**
+         * Grab X, Y, Z values.
+         * Perform some kind of check to make sure they will show
+         * Add to our history buffer for latter processing
+         *
+         */
+
+        var x = document.getElementById("x").value;
+        var y = document.getElementById("y").value;
+        var z = document.getElementById("z").value;
+
+        //  Check the bounds
+        // Should be between -3 to 3
+        x = numberCheck(x, 3);
+        y = numberCheck(y, 3);
+        z = numberCheck(z, 3);
+
+        historyArray.push([  shapeArray[current], flag, [x,y,z], randomAxis()   ]);
+
+    });
+
+
     render();
 };
+
 
 var render = function(){
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -264,4 +316,12 @@ function shapeMapper(funk,  startIndex) {
 
 function randomAxis() {
     return Math.floor(Math.random() * 3);
+}
+function numberCheck(num, bounds) {
+    if (num > bounds)
+        num = bounds;
+    if (num < -bounds)
+        num = -bounds
+    return num;
+
 }

@@ -61,6 +61,7 @@ main()
 <script type="text/javascript" src="sphere.js"></script>
 <script type="text/javascript" src="cone.js"></script>
 
+
 <script type="text/javascript" src="mcglincy-assignment-3.js"></script>
 
 <body>
@@ -70,11 +71,37 @@ main()
 
 <br/>
 
-<!--<button id= "xButton">Rotate X</button>-->
-<!--<button id= "yButton">Rotate Y</button>-->
-<!--<button id= "zButton">Rotate Z</button>-->
+
 <div>
     <button id="button-canvas" >Increase Canvas</button>
+</div>
+
+
+<div>
+    <h5>Choose number from: -3 to 3</h5>
+    <p>Value X-Axis.</p> <input type="number" id="x" value="0">
+    <p>Value Y-Axis.</p> <input type="number" id="y" value="0">
+    <p>Value Z-Axis.</p> <input type="number" id="z" value="0">
+
+
+    <button id="button-create">Create Object</button>
+</div>
+
+<div>
+    Shape
+    <select id="menu-shape" size="=3">
+        <option value="0">Cube</option>
+        <option value="1">Sphere</option>
+        <option value="2">Cone</option>
+    </select>
+</div>
+
+<div>
+    Shader
+    <select id="menu-shader" size="=2">
+        <option value="0">Lighting</option>
+        <option value="1">No Lighting</option>
+    </select>
 </div>
 
 
