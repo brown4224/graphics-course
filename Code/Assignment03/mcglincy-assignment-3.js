@@ -1,13 +1,18 @@
 "use strict";
 
 var canvas;
+var program;
 var gl;
+var shaderFlag;
+var flag;
+
 
 
 var debug = false;
 // Arrays
 var pointsArray = [];
 var normalsArray = [];
+// var flag = vec2(0,0);
 
 var shapeArray = [];  // CUBE, SPHERE, CONE: [START, END POINTS]
 var renderCube = 0;
@@ -83,8 +88,8 @@ window.onload = function init() {
     gl.clearColor( 0.9, 0.9, 0.9, 1.0 );
     gl.enable(gl.DEPTH_TEST);
 
-
-    var program = initShaders( gl, "light-shader",  "fragment-shader" );
+    program = initShaders( gl, "light-shader",  "fragment-shader" );
+    // program = vshader;
     gl.useProgram( program );
 
     ///////////////  DRAW SHAPES   //////////////////////
@@ -93,6 +98,7 @@ window.onload = function init() {
     shapeMapper(drawCube, pointsArray.length);
     shapeMapper(drawSphere, pointsArray.length);
     shapeMapper(drawCone, pointsArray.length);
+
 
     // MODEL VIEW AND CAMERA
     aspect =  canvas.width/canvas.height;
@@ -133,7 +139,6 @@ window.onload = function init() {
     gl.vertexAttribPointer( vPosition, 4, gl.FLOAT, false, 0, 0 );
     gl.enableVertexAttribArray( vPosition );
 
-    ///////////////  UNIFORM VARIABLES   //////////////////////
     modelView = gl.getUniformLocation( program, "modelView" );
     projection = gl.getUniformLocation( program, "projection" );
     gl.uniform4fv(gl.getUniformLocation(program, "ambientProduct"), flatten(ambientProduct));
@@ -141,6 +146,7 @@ window.onload = function init() {
     gl.uniform4fv(gl.getUniformLocation(program, "specularProduct"), flatten(specularProduct) );
     gl.uniform4fv(gl.getUniformLocation(program, "lightPosition"), flatten(lightPosition) );
     gl.uniform1f(gl.getUniformLocation(program, "shininess"),materialShininess);
+    // gl.uniform2fv(gl.getUniformLocation(program, "shaderFlag"), flatten(vec2(0.0,0.0)));
 
 
 
@@ -166,7 +172,6 @@ window.onload = function init() {
     render();
 };
 
-
 var render = function(){
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
@@ -187,7 +192,7 @@ var render = function(){
     mvMatrix = mult(mvMatrix, rotateZ(rotateAxis[2] ));
     mvMatrix = mult(mvMatrix, rotateY(rotateAxis[1] ));
     mvMatrix = mult(mvMatrix, rotateX(rotateAxis[0] ));
-    renderObject(shapeArray[renderCube]);
+    renderObject(shapeArray[renderCube], true);
 
 
     //  Sphere
@@ -196,7 +201,27 @@ var render = function(){
     mvMatrix = mult(mvMatrix, rotateZ(rotateAxis[2] ));
     mvMatrix = mult(mvMatrix, rotateY(rotateAxis[1] ));
     mvMatrix = mult(mvMatrix, rotateX(rotateAxis[0] ));
+    renderObject(shapeArray[renderSphere], true);
+
+
+    //  Sphere
+    mvMatrix = mult(look, scalem(1.0, 1.0, 1.0) );
+    // mvMatrix = mult(mvMatrix, translate(-2, 0.0, 0.0) );
+    mvMatrix = mult(mvMatrix, rotateZ(rotateAxis[2] ));
+    mvMatrix = mult(mvMatrix, rotateY(rotateAxis[1] ));
+    mvMatrix = mult(mvMatrix, rotateX(rotateAxis[0] ));
+    renderObject(shapeArray[renderSphere], false);
+
+    //  Sphere light shader
+    // console.log(lshader);
+    // switchProgram(lshader);
+    mvMatrix = mult(look, scalem(1.0, 1.0, 1.0) );
+    mvMatrix = mult(mvMatrix, translate(-2, 0.0, 0.0) );
+    mvMatrix = mult(mvMatrix, rotateZ(rotateAxis[2] ));c
+    mvMatrix = mult(mvMatrix, rotateY(rotateAxis[1] ));
+    mvMatrix = mult(mvMatrix, rotateX(rotateAxis[0] ));
     renderObject(shapeArray[renderSphere]);
+
 
     // // Second Object
     mvMatrix = mult(look, scalem(1.0, 1.0, 1.0) );
@@ -204,13 +229,23 @@ var render = function(){
     mvMatrix = mult(mvMatrix, rotateZ(rotateAxis[2] ));
     mvMatrix = mult(mvMatrix, rotateY(rotateAxis[1] ));
     mvMatrix = mult(mvMatrix, rotateX(rotateAxis[0] ));
-    renderObject(shapeArray[renderCone]);
+    renderObject(shapeArray[renderCone], true);
 
 
     requestAnimFrame(render);
 };
 
-function renderObject(indexArray) {
+function renderObject(indexArray, flag) {
+    // False: Use Vertex Shader
+    // True: Use Light Shader
+    var flagValue = 0.0;
+    if(flag){
+        flagValue = 1.0;
+    }
+
+    gl.uniform1f(gl.getUniformLocation(program, "shaderFlag"), flagValue);
+
+
     gl.uniformMatrix4fv( modelView, false, flatten(mvMatrix) );
     gl.uniformMatrix4fv( projection, false, flatten(pMatrix) );
     gl.drawArrays( gl.TRIANGLES, indexArray[0], indexArray[1] );
