@@ -57,7 +57,7 @@ main()
 <script type="text/javascript" src="../Common/initShaders.js"></script>
 <script type="text/javascript" src="../Common/MV.js"></script>
 <script type="text/javascript" src="cube.js"></script>
-<!--<script type="text/javascript" src="sphere-copy.js"></script>-->
+<!--<script type="text/javascript" src="sphere-alt.js"></script>-->
 <script type="text/javascript" src="sphere.js"></script>
 <script type="text/javascript" src="cone.js"></script>
 
@@ -79,24 +79,21 @@ main()
 
 <div>
     <h5>Choose number from: -3 to 3</h5>
-    <p>Value X-Axis.</p> <input type="number" id="x" value="0">
-    <p>Value Y-Axis.</p> <input type="number" id="y" value="0">
-    <p>Value Z-Axis.</p> <input type="number" id="z" value="0">
-
-
+    Value X-Axis <input type="number" id="x" value="0">
+    Value Y-Axis <input type="number" id="y" value="0">
+    Value Z-Axis <input type="number" id="z" value="0">
     <button id="button-create">Create Object</button>
 </div>
 
 <div>
+    <h5>State Your Intentions</h5>
     Shape
     <select id="menu-shape" size="=3">
         <option value="0">Cube</option>
         <option value="1">Sphere</option>
         <option value="2">Cone</option>
     </select>
-</div>
 
-<div>
     Shader
     <select id="menu-shader" size="=2">
         <option value="0">Lighting</option>
@@ -104,6 +101,38 @@ main()
     </select>
 </div>
 
+<div>
+    <h5>Light Color</h5>
+    <p id="rgb"></p>
+    <button id="button-light-red-plus">Red++</button>
+    <button id="button-light-red-minus">Red--</button>
+    <button id="button-light-green-plus">Green++</button>
+    <button id="button-light-green-minus">Green--</button>
+    <button id="button-light-blue-plus">Blue++</button>
+    <button id="button-light-blue-minus">Blue--</button>
+</div>
+<div>
+    <h5>Light Movement</h5>
+    <p id="light-bulb"></p>
+    <button id="button-light-position-x-plus">X++</button>
+    <button id="button-light-position-x-minus">X--</button>
+    <button id="button-light-position-y-plus">Y++</button>
+    <button id="button-light-position-y-minus">Y--</button>
+    <button id="button-light-position-z-plus">Z++</button>
+    <button id="button-light-position-z-minus">Z--</button>
+</div>
+<h5>Camera Movement</h5>
+<button id = "button-near-increase">Near-Far++</button>
+<button id = "button-near-minus">Near-Far--</button>
+<button id = "button-radius-plus">Distance++</button>
+<button id = "button-radius-minus">Distance--</button>
+
+<p> </p>
+<button id = "button-theta-increase">Theta++</button>
+<button id = "button-theta-decrease">Theta--</button>
+<button id = "button-phi-increase">Phi++</button>
+<button id = "button-phi-decrease">Phi--</button>
+<p> </p>
 
 </body>
 </html>

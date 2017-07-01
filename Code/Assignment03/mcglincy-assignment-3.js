@@ -29,7 +29,7 @@ var rotateAxis = [ 0.0, 0.0, 0.0 ]; //Theta X,Y,Z
 //   Perspective
 var near = 0.1;
 var far = 30.0;
-var radius = 4.0;
+var radius = 8.0;
 var theta  = 0.0;
 var phi    = 0.0;
 var dr = 5.0 * Math.PI/180.0;
@@ -46,8 +46,8 @@ var projection;
 
 // Eye
 var look;
-// var eye;
-var eye = vec3(0.0, 0.0, 8.0);
+var eye;
+// var eye = vec3(0.0, 0.0, 8.0);
 const at = vec3(0.0, 0.0, 0.0);
 const up = vec3(0.0, 1.0, 0.0);
 
@@ -59,11 +59,16 @@ var zAxis = 0;
 // Lighting
 var ambientColor, diffuseColor, specularColor;
 
+// Lighting Color
+var red = 1.0;
+var green = 1.0;
+var blue = 1.0;
+
+
 var lightPosition = vec4(5.0, 0.0, 10.0, 0.0 );
-var lightAmbient = vec4( 0.75, 0.75, 0.75, 1.0 );
-// var lightAmbient = vec4( 1.0, 1.0, 1.0, 1.0 );
-var lightDiffuse = vec4( 1.0, 1.0, 1.0, 1.0);
-var lightSpecular = vec4( 1.0, 1.0, 1.0, 1.0 );
+var lightAmbient;
+var lightDiffuse;
+var lightSpecular;
 
 var materialAmbient = vec4( 1.0, 1.0, 1.0, 1.0 );
 var materialDiffuse = vec4( 1.0, 1.0, 1.0, 1.0);
@@ -94,8 +99,9 @@ window.onload = function init() {
     gl.enable(gl.DEPTH_TEST);
 
     program = initShaders( gl, "light-shader",  "fragment-shader" );
-    // program = vshader;
     gl.useProgram( program );
+
+
 
     ///////////////  DRAW SHAPES   //////////////////////
     // Imported from Cube File
@@ -106,31 +112,16 @@ window.onload = function init() {
 
     ///////////////  PREPARE FOR RENDERING   //////////////////////
     // Sphere -- Vertex shader
-    var trans = [-2, 0.0, 0.0];
+    var trans = [2.0, 0.0, 0.0];
     historyArray.push([  shapeArray[renderSphere], false, trans, randomAxis()   ]);
 
     // Sphere -- Lighting shader
     trans = [-2, 1.0, 0.0];
     historyArray.push([  shapeArray[renderSphere], true, trans, randomAxis()   ]);
 
-    console.log(randomAxis());
-
-    console.log(randomAxis());
-
-    console.log(randomAxis());
-
     // MODEL VIEW AND CAMERA
     aspect =  canvas.width/canvas.height;
-    // eye = vec3(radius*Math.sin(theta)*Math.cos(phi), radius*Math.sin(theta)*Math.sin(phi), radius*Math.cos(theta));
-    look = lookAt(eye, at , up);
-    pMatrix = perspective(fovy, aspect, near, far);
 
-
-
-    ///////////////  LIGHTING   //////////////////////
-    var ambientProduct = mult(lightAmbient, materialAmbient);
-    var diffuseProduct = mult(lightDiffuse, materialDiffuse);
-    var specularProduct = mult(lightSpecular, materialSpecular);
 
 
 
@@ -163,25 +154,48 @@ window.onload = function init() {
 
     modelView = gl.getUniformLocation( program, "modelView" );
     projection = gl.getUniformLocation( program, "projection" );
-    gl.uniform4fv(gl.getUniformLocation(program, "ambientProduct"), flatten(ambientProduct));
-    gl.uniform4fv(gl.getUniformLocation(program, "diffuseProduct"), flatten(diffuseProduct) );
-    gl.uniform4fv(gl.getUniformLocation(program, "specularProduct"), flatten(specularProduct) );
-    gl.uniform4fv(gl.getUniformLocation(program, "lightPosition"), flatten(lightPosition) );
     gl.uniform1f(gl.getUniformLocation(program, "shininess"),materialShininess);
 
 
+    updateLight();
+    updateLightPosition();
 
+    function updateLight() {
+        ///////////////  LIGHTING   //////////////////////
+        lightAmbient = vec4( red, green, blue, 1.0 );
+        lightDiffuse = vec4( red, green, blue, 1.0);
+        lightSpecular = vec4( red, green, blue, 1.0 );
+
+        var ambientProduct = mult(lightAmbient, materialAmbient);
+        var diffuseProduct = mult(lightDiffuse, materialDiffuse);
+        var specularProduct = mult(lightSpecular, materialSpecular);
+
+        gl.uniform4fv(gl.getUniformLocation(program, "ambientProduct"), flatten(ambientProduct));
+        gl.uniform4fv(gl.getUniformLocation(program, "diffuseProduct"), flatten(diffuseProduct) );
+        gl.uniform4fv(gl.getUniformLocation(program, "specularProduct"), flatten(specularProduct) );
+
+
+        var str = "RGB: " + red + ", " + green + ", " + blue;
+        document.getElementById("rgb").innerHTML = str;
+    }
+    function updateLightPosition() {
+        ///////////////  LIGHTING Position   //////////////////////
+        gl.uniform4fv(gl.getUniformLocation(program, "lightPosition"), flatten(lightPosition) );
+
+        var str = "Light Postiion: " + lightPosition[0] + ", " + lightPosition[1] + ", " + lightPosition[2];
+        document.getElementById("light-bulb").innerHTML = str;
+    }
 
 
 // buttons for viewing parameters
-    // document.getElementById("Button1").onclick = function(){near  *= 1.1; far *= 1.1;};
-    // document.getElementById("Button2").onclick = function(){near *= 0.9; far *= 0.9;};
-    // document.getElementById("Button3").onclick = function(){radius *= 2.0;};
-    // document.getElementById("Button4").onclick = function(){radius *= 0.5;};
-    // document.getElementById("Button5").onclick = function(){theta += dr;};
-    // document.getElementById("Button6").onclick = function(){theta -= dr;};
-    // document.getElementById("Button7").onclick = function(){phi += dr;};
-    // document.getElementById("Button8").onclick = function(){phi -= dr;};
+    document.getElementById("button-near-increase").onclick = function(){near  *= 1.1; far *= 1.1;};
+    document.getElementById("button-near-minus").onclick = function(){near *= 0.9; far *= 0.9;};
+    document.getElementById("button-radius-plus").onclick = function(){radius += 1.0;};
+    document.getElementById("button-radius-minus").onclick = function(){radius -= 1.0;};
+    document.getElementById("button-theta-increase").onclick = function(){theta += dr;};
+    document.getElementById("button-theta-decrease").onclick = function(){theta -= dr;};
+    document.getElementById("button-phi-increase").onclick = function(){phi += dr;};
+    document.getElementById("button-phi-decrease").onclick = function(){phi -= dr;};
     document.getElementById("button-canvas").onclick =
         function () {
             canvas.width += 100;
@@ -234,14 +248,71 @@ window.onload = function init() {
 
         //  Check the bounds
         // Should be between -3 to 3
-        x = numberCheck(x, 3);
-        y = numberCheck(y, 3);
-        z = numberCheck(z, 3);
+        x = numberCheck(x);
+        y = numberCheck(y);
+        z = numberCheck(z);
 
         historyArray.push([  shapeArray[current], flag, [x,y,z], randomAxis()   ]);
 
     });
 
+    // Lighting Color
+    document.getElementById("button-light-red-plus").onclick = function(){
+        if(red < 1.0)
+            red += 0.1;
+        updateLight()
+    };
+    document.getElementById("button-light-red-minus").onclick = function(){
+        if(red > 0.0)
+            red -= 0.1;
+        updateLight();
+    };
+    document.getElementById("button-light-green-plus").onclick = function(){
+        if(green < 1.0)
+            green += 0.1;
+        updateLight();
+    };
+    document.getElementById("button-light-green-minus").onclick = function(){
+        if(green > 0.0)
+            green -= 0.1;
+        updateLight();
+    };
+    document.getElementById("button-light-blue-plus").onclick = function(){
+        if(blue < 1.0)
+            blue += 0.1;
+        updateLight();
+    };
+    document.getElementById("button-light-blue-minus").onclick = function(){
+        if(blue > 1.0)
+            blue -= 0.1;
+        updateLight();
+    };
+
+    // Lighting Position
+    document.getElementById("button-light-position-x-plus").onclick = function(){
+        lightPosition = vec4(++lightPosition[0], lightPosition[1], lightPosition[2], 1.0);
+        updateLightPosition();
+    };
+    document.getElementById("button-light-position-x-minus").onclick = function(){
+        lightPosition = vec4(--lightPosition[0], lightPosition[1], lightPosition[2], 1.0);
+        updateLightPosition();
+    };
+    document.getElementById("button-light-position-y-plus").onclick = function(){
+        lightPosition = vec4(lightPosition[0], ++lightPosition[1], lightPosition[2], 1.0);
+        updateLightPosition();
+    };
+    document.getElementById("button-light-position-y-minus").onclick = function(){
+        lightPosition = vec4(lightPosition[0], --lightPosition[1], lightPosition[2], 1.0);
+        updateLightPosition();
+    };
+    document.getElementById("button-light-position-z-plus").onclick = function(){
+        lightPosition = vec4(lightPosition[0], lightPosition[1], ++lightPosition[2], 1.0)
+        updateLightPosition()
+    };
+    document.getElementById("button-light-position-z-minus").onclick = function(){
+        lightPosition = vec4(lightPosition[0], lightPosition[1], --lightPosition[2], 1.0)
+        updateLightPosition()
+    };
 
     render();
 };
@@ -251,8 +322,13 @@ var render = function(){
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
 
+    // CAMERA AND MODEL VIEW
+    eye = vec3(radius*Math.sin(theta)*Math.cos(phi), radius*Math.sin(theta)*Math.sin(phi), radius*Math.cos(theta));
+    look = lookAt(eye, at , up);
+    pMatrix = perspective(fovy, aspect, near, far);
 
-    // Matrix Manipulation
+
+    // Rotation
     rotateAxis[xAxis] += 1.0; // x axis
     rotateAxis[yAxis] += 1.0;  // y axis
     rotateAxis[zAxis] += 1.0;  // z axis
@@ -271,17 +347,17 @@ var render = function(){
 };
 
 function renderObject(indexArray, flag, trans, axis) {
-
-
     // False: Use Vertex Shader
     // True: Use Light Shader
+    // Flag is passed into the shader as a float
     var flagValue = 0.0;
     if(flag){
         flagValue = 1.0;
     }
 
 
-    // Translate
+    // Look, Scale, Translate
+    // Look: Resets the position for each object
     mvMatrix = mult(look, scalem(1.0, 1.0, 1.0) );
     mvMatrix = mult(mvMatrix, translate(trans) );
 
@@ -299,7 +375,7 @@ function renderObject(indexArray, flag, trans, axis) {
 
     }
 
-
+    // All that work:  Lets Render!
     gl.uniform1f(gl.getUniformLocation(program, "shaderFlag"), flagValue);
     gl.uniformMatrix4fv( modelView, false, flatten(mvMatrix) );
     gl.uniformMatrix4fv( projection, false, flatten(pMatrix) );
@@ -317,11 +393,11 @@ function shapeMapper(funk,  startIndex) {
 function randomAxis() {
     return Math.floor(Math.random() * 3);
 }
-function numberCheck(num, bounds) {
-    if (num > bounds)
-        num = bounds;
-    if (num < -bounds)
-        num = -bounds
+function numberCheck(num) {
+    if (num > 3)
+        num = 3;
+    if (num < -3)
+        num = -3
     return num;
 
 }
