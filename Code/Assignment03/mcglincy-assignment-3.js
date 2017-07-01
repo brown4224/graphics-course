@@ -18,6 +18,7 @@ var shapeArray = [];  // CUBE, SPHERE, CONE: [START, END POINTS]
 var renderCube = 0;
 var renderSphere = 1;
 var renderCone = 2;
+var current = 0;
 var historyArray = [];
 var colorsArray = [];
 
@@ -46,10 +47,16 @@ var modelView;
 var projection;
 
 // Eye
+var look;
 // var eye;
 var eye = vec3(0.0, 0.0, 8.0);
 const at = vec3(0.0, 0.0, 0.0);
 const up = vec3(0.0, 1.0, 0.0);
+
+// Rotate
+var xAxis = 0;
+var yAxis = 0;
+var zAxis = 0;
 
 // Lighting
 var ambientColor, diffuseColor, specularColor;
@@ -99,9 +106,26 @@ window.onload = function init() {
     shapeMapper(drawSphere, pointsArray.length);
     shapeMapper(drawCone, pointsArray.length);
 
+    ///////////////  PREPARE FOR RENDERING   //////////////////////
+    // Sphere -- Vertex shader
+    var trans = [-2, 0.0, 0.0];
+    historyArray.push([  shapeArray[renderSphere], false, trans, randomAxis()   ]);
+
+    // Sphere -- Lighting shader
+    trans = [-2, 1.0, 0.0];
+    historyArray.push([  shapeArray[renderSphere], true, trans, randomAxis()   ]);
+
+    console.log(randomAxis());
+
+    console.log(randomAxis());
+
+    console.log(randomAxis());
 
     // MODEL VIEW AND CAMERA
     aspect =  canvas.width/canvas.height;
+    // eye = vec3(radius*Math.sin(theta)*Math.cos(phi), radius*Math.sin(theta)*Math.sin(phi), radius*Math.cos(theta));
+    look = lookAt(eye, at , up);
+    pMatrix = perspective(fovy, aspect, near, far);
 
 
 
@@ -146,7 +170,6 @@ window.onload = function init() {
     gl.uniform4fv(gl.getUniformLocation(program, "specularProduct"), flatten(specularProduct) );
     gl.uniform4fv(gl.getUniformLocation(program, "lightPosition"), flatten(lightPosition) );
     gl.uniform1f(gl.getUniformLocation(program, "shininess"),materialShininess);
-    // gl.uniform2fv(gl.getUniformLocation(program, "shaderFlag"), flatten(vec2(0.0,0.0)));
 
 
 
@@ -175,67 +198,29 @@ window.onload = function init() {
 var render = function(){
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    // eye = vec3(radius*Math.sin(theta)*Math.cos(phi), radius*Math.sin(theta)*Math.sin(phi), radius*Math.cos(theta));
-    var look = lookAt(eye, at , up);
-    pMatrix = perspective(fovy, aspect, near, far);
+
 
     // Matrix Manipulation
-    rotateAxis[axis] += 2.0; // x axis
-    rotateAxis[1] += 2.0;  // y axis
-    rotateAxis[2] += 2.0;  // y axis
-
-    trans[0] += 0.1;
-
-    // Cube
-    mvMatrix = mult(look, scalem(1.0, 1.0, 1.0) );
-    mvMatrix = mult(mvMatrix, translate(-2, 2, 0.0) );
-    mvMatrix = mult(mvMatrix, rotateZ(rotateAxis[2] ));
-    mvMatrix = mult(mvMatrix, rotateY(rotateAxis[1] ));
-    mvMatrix = mult(mvMatrix, rotateX(rotateAxis[0] ));
-    renderObject(shapeArray[renderCube], true);
+    rotateAxis[xAxis] += 1.0; // x axis
+    rotateAxis[yAxis] += 1.0;  // y axis
+    rotateAxis[zAxis] += 1.0;  // z axis
 
 
-    //  Sphere
-    mvMatrix = mult(look, scalem(1.0, 1.0, 1.0) );
-    mvMatrix = mult(mvMatrix, translate(-2, 0.0, 0.0) );
-    mvMatrix = mult(mvMatrix, rotateZ(rotateAxis[2] ));
-    mvMatrix = mult(mvMatrix, rotateY(rotateAxis[1] ));
-    mvMatrix = mult(mvMatrix, rotateX(rotateAxis[0] ));
-    renderObject(shapeArray[renderSphere], true);
+    // renderObject(shapeArray[renderSphere], true, 0, randomAxis());
+    var size = historyArray.length;
+    for(var i = 0; i<  size; i++){
+        var arr = historyArray[i];
+        renderObject(arr[0], arr[1], arr[2], arr[3]);
+    }
 
-
-    //  Sphere
-    mvMatrix = mult(look, scalem(1.0, 1.0, 1.0) );
-    // mvMatrix = mult(mvMatrix, translate(-2, 0.0, 0.0) );
-    mvMatrix = mult(mvMatrix, rotateZ(rotateAxis[2] ));
-    mvMatrix = mult(mvMatrix, rotateY(rotateAxis[1] ));
-    mvMatrix = mult(mvMatrix, rotateX(rotateAxis[0] ));
-    renderObject(shapeArray[renderSphere], false);
-
-    //  Sphere light shader
-    // console.log(lshader);
-    // switchProgram(lshader);
-    mvMatrix = mult(look, scalem(1.0, 1.0, 1.0) );
-    mvMatrix = mult(mvMatrix, translate(-2, 0.0, 0.0) );
-    mvMatrix = mult(mvMatrix, rotateZ(rotateAxis[2] ));c
-    mvMatrix = mult(mvMatrix, rotateY(rotateAxis[1] ));
-    mvMatrix = mult(mvMatrix, rotateX(rotateAxis[0] ));
-    renderObject(shapeArray[renderSphere]);
-
-
-    // // Second Object
-    mvMatrix = mult(look, scalem(1.0, 1.0, 1.0) );
-    mvMatrix = mult(mvMatrix, translate(-2, -2, 0.0) );
-    mvMatrix = mult(mvMatrix, rotateZ(rotateAxis[2] ));
-    mvMatrix = mult(mvMatrix, rotateY(rotateAxis[1] ));
-    mvMatrix = mult(mvMatrix, rotateX(rotateAxis[0] ));
-    renderObject(shapeArray[renderCone], true);
 
 
     requestAnimFrame(render);
 };
 
-function renderObject(indexArray, flag) {
+function renderObject(indexArray, flag, trans, axis) {
+
+
     // False: Use Vertex Shader
     // True: Use Light Shader
     var flagValue = 0.0;
@@ -243,9 +228,27 @@ function renderObject(indexArray, flag) {
         flagValue = 1.0;
     }
 
+
+    // Translate
+    mvMatrix = mult(look, scalem(1.0, 1.0, 1.0) );
+    mvMatrix = mult(mvMatrix, translate(trans) );
+
+    // Rotate Axis
+    switch (axis){
+        case 0:
+            mvMatrix = mult(mvMatrix, rotateX(rotateAxis[xAxis] ));
+            break;
+        case 1:
+            mvMatrix = mult(mvMatrix, rotateY(rotateAxis[yAxis] ));
+            break;
+        case 2:
+            mvMatrix = mult(mvMatrix, rotateZ(rotateAxis[zAxis] ));
+            break;
+
+    }
+
+
     gl.uniform1f(gl.getUniformLocation(program, "shaderFlag"), flagValue);
-
-
     gl.uniformMatrix4fv( modelView, false, flatten(mvMatrix) );
     gl.uniformMatrix4fv( projection, false, flatten(pMatrix) );
     gl.drawArrays( gl.TRIANGLES, indexArray[0], indexArray[1] );
@@ -257,7 +260,8 @@ function shapeMapper(funk,  startIndex) {
     funk();
     var offset = pointsArray.length - startIndex;
     shapeArray.push([startIndex, offset]);
+}
 
-
-
+function randomAxis() {
+    return Math.floor(Math.random() * 3);
 }
