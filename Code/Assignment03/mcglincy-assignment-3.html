@@ -121,6 +121,7 @@ main()
     <button id="button-light-position-z-plus">Z++</button>
     <button id="button-light-position-z-minus">Z--</button>
 </div>
+<div>
 <h5>Camera Movement</h5>
 <button id = "button-near-increase">Near-Far++</button>
 <button id = "button-near-minus">Near-Far--</button>
@@ -133,6 +134,20 @@ main()
 <button id = "button-phi-increase">Phi++</button>
 <button id = "button-phi-decrease">Phi--</button>
 <p> </p>
+</div>
+
+<div>
+    <h3>Sphere Movement</h3>
+    <select id="menu-sphere-select" size="=2">
+        <option value="0">Sphere 1</option>
+        <option value="1">Sphere 2</option>
+    </select>
+    Value X-Axis <input type="number" id="spherex" value="1">
+    Value Y-Axis <input type="number" id="spherey" value="1">
+    Value Z-Axis <input type="number" id="spherez" value="1">
+    <button id="button-sphere-scale">Scale</button>
+    <button id="button-sphere-trans">Transform</button>
+</div>
 
 </body>
 </html>

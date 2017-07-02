@@ -5,10 +5,9 @@ var program;
 var gl;
 var shaderFlag;
 var flag = true;
-
-
-
 var debug = false;
+var random =0;
+
 // Arrays
 var pointsArray = [];
 var normalsArray = [];
@@ -32,7 +31,7 @@ var far = 30.0;
 var radius = 8.0;
 var theta  = 0.0;
 var phi    = 0.0;
-var dr = 5.0 * Math.PI/180.0;
+var dr = 10.0 * Math.PI/180.0;
 
 // Aspect Ratio
 var  fovy = 45.0;  // Field-of-view in Y direction angle (in degrees)
@@ -47,7 +46,6 @@ var projection;
 // Eye
 var look;
 var eye;
-// var eye = vec3(0.0, 0.0, 8.0);
 const at = vec3(0.0, 0.0, 0.0);
 const up = vec3(0.0, 1.0, 0.0);
 
@@ -64,7 +62,6 @@ var red = 1.0;
 var green = 1.0;
 var blue = 1.0;
 
-
 var lightPosition = vec4(5.0, 0.0, 10.0, 0.0 );
 var lightAmbient;
 var lightDiffuse;
@@ -74,6 +71,13 @@ var materialAmbient = vec4( 1.0, 1.0, 1.0, 1.0 );
 var materialDiffuse = vec4( 1.0, 1.0, 1.0, 1.0);
 var materialSpecular = vec4( 1.0, 1.0, 1.0, 1.0 );
 var materialShininess = 100.0;
+
+// Default Spheres
+var sphereScale = [];
+var sphereTranslate = [];
+var sphereRotate = [];
+var sphereSelect = 0;
+
 
 
 // Color
@@ -100,6 +104,8 @@ window.onload = function init() {
 
     program = initShaders( gl, "light-shader",  "fragment-shader" );
     gl.useProgram( program );
+    aspect =  canvas.width/canvas.height;
+
 
 
 
@@ -110,18 +116,16 @@ window.onload = function init() {
     shapeMapper(drawSphere, pointsArray.length);
     shapeMapper(drawCone, pointsArray.length);
 
-    ///////////////  PREPARE FOR RENDERING   //////////////////////
+    // ///////////////  PREPARE FOR RENDERING   //////////////////////
     // Sphere -- Vertex shader
-    var trans = [2.0, 0.0, 0.0];
-    historyArray.push([  shapeArray[renderSphere], false, trans, randomAxis()   ]);
+    sphereScale.push(vec3(1.0, 1.0, 1.0));
+    sphereTranslate.push([2.0, 0.0, 0.0]);
+    historyArray.push([  shapeArray[renderSphere], false, sphereScale[0], sphereTranslate[0], randomAxis()   ]);
 
     // Sphere -- Lighting shader
-    trans = [-2, 1.0, 0.0];
-    historyArray.push([  shapeArray[renderSphere], true, trans, randomAxis()   ]);
-
-    // MODEL VIEW AND CAMERA
-    aspect =  canvas.width/canvas.height;
-
+    sphereScale.push(vec3(1.0, 1.0, 1.0));
+    sphereTranslate.push([-2, 1.0, 0.0]);
+    historyArray.push([  shapeArray[renderSphere], true, sphereScale[1], sphereTranslate[1], randomAxis()   ]);
 
 
 
@@ -159,7 +163,6 @@ window.onload = function init() {
 
     updateLight();
     updateLightPosition();
-
     function updateLight() {
         ///////////////  LIGHTING   //////////////////////
         lightAmbient = vec4( red, green, blue, 1.0 );
@@ -187,15 +190,8 @@ window.onload = function init() {
     }
 
 
-// buttons for viewing parameters
-    document.getElementById("button-near-increase").onclick = function(){near  *= 1.1; far *= 1.1;};
-    document.getElementById("button-near-minus").onclick = function(){near *= 0.9; far *= 0.9;};
-    document.getElementById("button-radius-plus").onclick = function(){radius += 1.0;};
-    document.getElementById("button-radius-minus").onclick = function(){radius -= 1.0;};
-    document.getElementById("button-theta-increase").onclick = function(){theta += dr;};
-    document.getElementById("button-theta-decrease").onclick = function(){theta -= dr;};
-    document.getElementById("button-phi-increase").onclick = function(){phi += dr;};
-    document.getElementById("button-phi-decrease").onclick = function(){phi -= dr;};
+    ///////////////  BUTTONS   //////////////////////
+    ///////////////  BUTTONS  Canvas   //////////////////////
     document.getElementById("button-canvas").onclick =
         function () {
             canvas.width += 100;
@@ -204,6 +200,7 @@ window.onload = function init() {
 
         };
 
+    ///////////////  BUTTONS  Shape   //////////////////////
     document.getElementById("menu-shape").addEventListener("click", function () {
         // Change Cube, Sphere, Cone
         switch (this.selectedIndex) {
@@ -221,6 +218,7 @@ window.onload = function init() {
         }
 
     });
+    ///////////////  BUTTONS  Shader   //////////////////////
     document.getElementById("menu-shader").addEventListener("click", function () {
         // Switches Rendering Intent
         switch (this.selectedIndex) {
@@ -234,6 +232,7 @@ window.onload = function init() {
 
     });
 
+    ///////////////  BUTTONS  Create Object   //////////////////////
     document.getElementById("button-create").addEventListener("click", function () {
         /**
          * Grab X, Y, Z values.
@@ -252,11 +251,13 @@ window.onload = function init() {
         y = numberCheck(y);
         z = numberCheck(z);
 
-        historyArray.push([  shapeArray[current], flag, [x,y,z], randomAxis()   ]);
+        var userScale = [1.0, 1.0, 1.0];
+
+        historyArray.push([  shapeArray[current], flag,userScale, [x,y,z], randomAxis()   ]);
 
     });
 
-    // Lighting Color
+    ///////////////  BUTTONS  Light Color   //////////////////////
     document.getElementById("button-light-red-plus").onclick = function(){
         if(red < 1.0)
             red += 0.1;
@@ -283,12 +284,12 @@ window.onload = function init() {
         updateLight();
     };
     document.getElementById("button-light-blue-minus").onclick = function(){
-        if(blue > 1.0)
+        if(blue > 0.0)
             blue -= 0.1;
         updateLight();
     };
 
-    // Lighting Position
+    ///////////////  BUTTONS  Light Position   //////////////////////
     document.getElementById("button-light-position-x-plus").onclick = function(){
         lightPosition = vec4(++lightPosition[0], lightPosition[1], lightPosition[2], 1.0);
         updateLightPosition();
@@ -314,6 +315,76 @@ window.onload = function init() {
         updateLightPosition()
     };
 
+    ///////////////  BUTTONS  Camera   //////////////////////
+    document.getElementById("button-near-increase").onclick = function(){near  *= 1.1; far *= 1.1;};
+    document.getElementById("button-near-minus").onclick = function(){near *= 0.9; far *= 0.9;};
+    document.getElementById("button-radius-plus").onclick = function(){radius += 1.0;};
+    document.getElementById("button-radius-minus").onclick = function(){radius -= 1.0;};
+    document.getElementById("button-theta-increase").onclick = function(){theta += dr;};
+    document.getElementById("button-theta-decrease").onclick = function(){theta -= dr;};
+    document.getElementById("button-phi-increase").onclick = function(){phi += dr;};
+    document.getElementById("button-phi-decrease").onclick = function(){phi -= dr;};
+
+    ///////////////  BUTTONS  Sphere Select   //////////////////////
+    document.getElementById("menu-sphere-select").addEventListener("click", function () {
+        // Switches Rendering Intent
+        switch (this.selectedIndex) {
+            case 0:
+                sphereSelect = 0;
+                break;
+            case 1:
+                sphereSelect = 1;
+                break;
+        }
+
+    });
+    ///////////////  BUTTONS  Sphere Scale   //////////////////////
+    document.getElementById("button-sphere-scale").addEventListener("click", function () {
+        /**
+         * Grab X, Y, Z values.
+         * Perform some kind of check to make sure they will show
+         * Use Sphere Select to choose the current sphere
+         * Update the history array
+         *
+         */
+
+        var x = document.getElementById("spherex").value;
+        var y = document.getElementById("spherey").value;
+        var z = document.getElementById("spherez").value;
+
+        if (x < 0)
+            x = 0;
+        if (y < 0)
+            y = 0;
+        if (z < 0)
+            z =0;
+
+        var i = sphereSelect;
+        historyArray[i][2] = [x, y, z];
+    });
+    document.getElementById("button-sphere-trans").addEventListener("click", function () {
+        /**
+         * Grab X, Y, Z values.
+         * Perform some kind of check to make sure they will show
+         * Use Sphere Select to choose the current sphere
+         * Update the history array
+         *
+         */
+        console.log("Translate Button");
+
+
+        var x = document.getElementById("spherex").value;
+        var y = document.getElementById("spherey").value;
+        var z = document.getElementById("spherez").value;
+
+        x = numberCheck(x);
+        y = numberCheck(y);
+        z = numberCheck(z);
+
+        var i = sphereSelect;
+        historyArray[i][3] = vec3(x, y, z);
+    });
+
     render();
 };
 
@@ -321,12 +392,10 @@ window.onload = function init() {
 var render = function(){
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-
     // CAMERA AND MODEL VIEW
     eye = vec3(radius*Math.sin(theta)*Math.cos(phi), radius*Math.sin(theta)*Math.sin(phi), radius*Math.cos(theta));
     look = lookAt(eye, at , up);
     pMatrix = perspective(fovy, aspect, near, far);
-
 
     // Rotation
     rotateAxis[xAxis] += 1.0; // x axis
@@ -334,11 +403,31 @@ var render = function(){
     rotateAxis[zAxis] += 1.0;  // z axis
 
 
-    // renderObject(shapeArray[renderSphere], true, 0, randomAxis());
+
+    ///////////////  Render Objects   //////////////////////
+    /**
+     *
+     * Pull objects from the history array.
+     * Position 0 & 1 are default spheres
+     *
+     * arr[0]:  Type of shape, pulls from the shapes array.
+     *             CUBE, SPHERE, CONE: [START, OFF Set]
+     *             The shapes array represents each object by the
+     *             vertex start position and off set.
+     *             For example the cube might start at postion 0 and sphere at 36.
+     *             The cube's value will then be [0, 36] and represent positions
+     *             0 to 35.  Position 36 is where the cube starts
+     * arr[1]:  Flag for shader.  Passed into shader and represents if lighting is used.
+     * arr[2]:  Vec3:   Scale values for matrix multiplication
+     * arr[3]:  Vec3:   Translation values for matrix multiplication
+     * arr[4]:  Vec3:   Boolan Flag for rotation
+     *                  Each axis can rotate at different speeds.
+     *                  This flag determine which axis will be rotated.
+     */
     var size = historyArray.length;
     for(var i = 0; i<  size; i++){
         var arr = historyArray[i];
-        renderObject(arr[0], arr[1], arr[2], arr[3]);
+        renderObject(arr[0], arr[1], arr[2], arr[3], arr[4]);
     }
 
 
@@ -346,7 +435,7 @@ var render = function(){
     requestAnimFrame(render);
 };
 
-function renderObject(indexArray, flag, trans, axis) {
+function renderObject(indexArray, flag, scaler, trans, axis) {
     // False: Use Vertex Shader
     // True: Use Light Shader
     // Flag is passed into the shader as a float
@@ -358,22 +447,18 @@ function renderObject(indexArray, flag, trans, axis) {
 
     // Look, Scale, Translate
     // Look: Resets the position for each object
-    mvMatrix = mult(look, scalem(1.0, 1.0, 1.0) );
+    mvMatrix = mult(look, scalem(scaler[0], scaler[1], scaler[2]) );
     mvMatrix = mult(mvMatrix, translate(trans) );
 
-    // Rotate Axis
-    switch (axis){
-        case 0:
-            mvMatrix = mult(mvMatrix, rotateX(rotateAxis[xAxis] ));
-            break;
-        case 1:
-            mvMatrix = mult(mvMatrix, rotateY(rotateAxis[yAxis] ));
-            break;
-        case 2:
-            mvMatrix = mult(mvMatrix, rotateZ(rotateAxis[zAxis] ));
-            break;
 
-    }
+    if(axis[0])
+            mvMatrix = mult(mvMatrix, rotateX(rotateAxis[xAxis] ));
+    if(axis[1])
+            mvMatrix = mult(mvMatrix, rotateY(rotateAxis[yAxis] ));
+    if(axis[2])
+            mvMatrix = mult(mvMatrix, rotateZ(rotateAxis[zAxis] ));
+
+
 
     // All that work:  Lets Render!
     gl.uniform1f(gl.getUniformLocation(program, "shaderFlag"), flagValue);
@@ -391,7 +476,22 @@ function shapeMapper(funk,  startIndex) {
 }
 
 function randomAxis() {
-    return Math.floor(Math.random() * 3);
+    // var axis = Math.floor(Math.random() * 3);
+    axis = random % 3;
+    random++
+    var ans;
+    switch (axis){
+        case 0:
+            ans = [true, false, false];
+            break;
+        case 1:
+            ans = [false, true, false];
+            break;
+        case 2:
+            ans = [false, false, true];
+            break;
+    }
+    return ans;
 }
 function numberCheck(num) {
     if (num > 3)
