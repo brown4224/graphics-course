@@ -1,3 +1,11 @@
+/**
+ * Sean McGlincy
+ * Graphics
+ * Assignment 3
+ * Summer 2017
+ *
+ * */
+
 var s_verticalPosition = [];
 var s_latitudeBands = 30;
 var s_longitudeBands = 30;

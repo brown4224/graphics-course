@@ -1,3 +1,11 @@
+/**
+ * Sean McGlincy
+ * Graphics
+ * Assignment 3
+ * Summer 2017
+ *
+ * */
+
 var c_radius = 0.5;
 var c_height = 2.0;
 
@@ -21,7 +29,7 @@ function drawCone() {
     var c = vec4(0, c_radius, 0, 1);
     var normal = makeNormal(a, b, c);
 
-    // Make Circle
+    // Make Circle (base)
     for(var i=0; i<= fullCircle; i += c_radian){
         var x = c_radius * Math.cos(i);
         var y = c_radius * 0;  // zero height
@@ -71,6 +79,7 @@ function drawCone() {
     normalsArray.push(normal);
     addColor();
 
+    // Add first point before starting loop
     pointsArray.push(c_first);
     var previous = c_first;
     addColor();

@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!--Sean McGlincy-->
 <html>
 
 
@@ -41,6 +42,9 @@ void main()
         fColor.a = 1.0;
     }
 }
+
+
+
 </script>
 
 <script id="fragment-shader" type="x-shader/x-fragment">
@@ -51,6 +55,9 @@ main()
 {
     gl_FragColor = fColor;
 }
+
+
+
 </script>
 
 <script type="text/javascript" src="../Common/webgl-utils.js"></script>
@@ -60,94 +67,102 @@ main()
 <!--<script type="text/javascript" src="sphere-alt.js"></script>-->
 <script type="text/javascript" src="sphere.js"></script>
 <script type="text/javascript" src="cone.js"></script>
-
-
 <script type="text/javascript" src="mcglincy-assignment-3.js"></script>
 
 <body>
-<canvas id="gl-canvas" width="900" height="900">
-    Oops ... your browser doesn't support the HTML5 canvas element
-</canvas>
 
-<br/>
+<div style="width: 100%">
+    <div style="float:left; width: 50%">
 
+        <canvas id="gl-canvas" width="900" height="900">
+            Oops ... your browser doesn't support the HTML5 canvas element
+        </canvas>
+    </div>
+    <div style="float:right;width: 50%">
 
-<div>
-    <button id="button-canvas" >Increase Canvas</button>
+        <br>
+        <br>
+        <div>
+            <h3>State Your Intentions</h3>
+            Shape
+            <select id="menu-shape" size="=3">
+                <option value="0">Cube</option>
+                <option value="1">Sphere</option>
+                <option value="2">Cone</option>
+            </select>
+
+            Shader
+            <select id="menu-shader" size="=2">
+                <option value="0">Lighting</option>
+                <option value="1">No Lighting</option>
+            </select>
+        </div>
+        <div>
+            <h3>Choose number from: -3 to 3</h3>
+            Value X-Axis <input type="number" id="x" value="0">
+            Value Y-Axis <input type="number" id="y" value="0">
+            Value Z-Axis <input type="number" id="z" value="0">
+            <button id="button-create">Create Object</button>
+        </div>
+
+        <div>
+            <h3>Light Color</h3>
+            <p id="rgb"></p>
+            <button id="button-light-red-plus">Red++</button>
+            <button id="button-light-red-minus">Red--</button>
+            <button id="button-light-green-plus">Green++</button>
+            <button id="button-light-green-minus">Green--</button>
+            <button id="button-light-blue-plus">Blue++</button>
+            <button id="button-light-blue-minus">Blue--</button>
+        </div>
+        <div>
+            <h3>Light Movement</h3>
+            <p id="light-bulb"></p>
+            <button id="button-light-position-x-plus">X++</button>
+            <button id="button-light-position-x-minus">X--</button>
+            <button id="button-light-position-y-plus">Y++</button>
+            <button id="button-light-position-y-minus">Y--</button>
+            <button id="button-light-position-z-plus">Z++</button>
+            <button id="button-light-position-z-minus">Z--</button>
+        </div>
+        <div>
+            <h3>Camera Movement</h3>
+            <button id="button-near-increase">Near-Far++</button>
+            <button id="button-near-minus">Near-Far--</button>
+            <button id="button-radius-plus">Distance++</button>
+            <button id="button-radius-minus">Distance--</button>
+
+            <p></p>
+            <button id="button-theta-increase">Theta++</button>
+            <button id="button-theta-decrease">Theta--</button>
+            <button id="button-phi-increase">Phi++</button>
+            <button id="button-phi-decrease">Phi--</button>
+            <p></p>
+        </div>
+
+        <div>
+            <h3>Sphere Movement</h3>
+            <select id="menu-sphere-select" size="=2">
+                <option value="0">Sphere 1</option>
+                <option value="1">Sphere 2</option>
+            </select>
+            Value X-Axis <input type="number" id="spherex" value="1">
+            Value Y-Axis <input type="number" id="spherey" value="1">
+            Value Z-Axis <input type="number" id="spherez" value="1">
+            <button id="button-sphere-scale">Scale</button>
+            <button id="button-sphere-trans">Transform</button>
+            <br>
+            <button id="button-sphere-rotate-x">Rotate X</button>
+            <button id="button-sphere-stop-x">Stop X</button>
+            <button id="button-sphere-rotate-y">Rotate Y</button>
+            <button id="button-sphere-stop-y">Stop Y</button>
+            <button id="button-sphere-rotate-z">Rotate Z</button>
+            <button id="button-sphere-stop-z">Stop Z</button>
+        </div>
+        <div>
+            <button id="button-canvas">Increase Canvas</button>
+        </div>
+    </div>
 </div>
-
-
-<div>
-    <h5>Choose number from: -3 to 3</h5>
-    Value X-Axis <input type="number" id="x" value="0">
-    Value Y-Axis <input type="number" id="y" value="0">
-    Value Z-Axis <input type="number" id="z" value="0">
-    <button id="button-create">Create Object</button>
-</div>
-
-<div>
-    <h5>State Your Intentions</h5>
-    Shape
-    <select id="menu-shape" size="=3">
-        <option value="0">Cube</option>
-        <option value="1">Sphere</option>
-        <option value="2">Cone</option>
-    </select>
-
-    Shader
-    <select id="menu-shader" size="=2">
-        <option value="0">Lighting</option>
-        <option value="1">No Lighting</option>
-    </select>
-</div>
-
-<div>
-    <h5>Light Color</h5>
-    <p id="rgb"></p>
-    <button id="button-light-red-plus">Red++</button>
-    <button id="button-light-red-minus">Red--</button>
-    <button id="button-light-green-plus">Green++</button>
-    <button id="button-light-green-minus">Green--</button>
-    <button id="button-light-blue-plus">Blue++</button>
-    <button id="button-light-blue-minus">Blue--</button>
-</div>
-<div>
-    <h5>Light Movement</h5>
-    <p id="light-bulb"></p>
-    <button id="button-light-position-x-plus">X++</button>
-    <button id="button-light-position-x-minus">X--</button>
-    <button id="button-light-position-y-plus">Y++</button>
-    <button id="button-light-position-y-minus">Y--</button>
-    <button id="button-light-position-z-plus">Z++</button>
-    <button id="button-light-position-z-minus">Z--</button>
-</div>
-<div>
-<h5>Camera Movement</h5>
-<button id = "button-near-increase">Near-Far++</button>
-<button id = "button-near-minus">Near-Far--</button>
-<button id = "button-radius-plus">Distance++</button>
-<button id = "button-radius-minus">Distance--</button>
-
-<p> </p>
-<button id = "button-theta-increase">Theta++</button>
-<button id = "button-theta-decrease">Theta--</button>
-<button id = "button-phi-increase">Phi++</button>
-<button id = "button-phi-decrease">Phi--</button>
-<p> </p>
-</div>
-
-<div>
-    <h3>Sphere Movement</h3>
-    <select id="menu-sphere-select" size="=2">
-        <option value="0">Sphere 1</option>
-        <option value="1">Sphere 2</option>
-    </select>
-    Value X-Axis <input type="number" id="spherex" value="1">
-    Value Y-Axis <input type="number" id="spherey" value="1">
-    Value Z-Axis <input type="number" id="spherez" value="1">
-    <button id="button-sphere-scale">Scale</button>
-    <button id="button-sphere-trans">Transform</button>
-</div>
-
 </body>
 </html>

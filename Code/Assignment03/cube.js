@@ -1,3 +1,10 @@
+/**
+ * Sean McGlincy
+ * Graphics
+ * Assignment 3
+ * Summer 2017
+ *
+ * */
 // CUBE
 function quad(a, b, c, d) {
 
